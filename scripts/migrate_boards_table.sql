@@ -79,6 +79,18 @@ CREATE TABLE IF NOT EXISTS "public"."lm_board_card" (
 );
 
 -- ----------------------------
+-- 2b. Table structure for lm_card_tombstone
+-- Durable deleted-card tombstones: without these, card deletions were
+-- only remembered in server memory and deleted cards resurrected from
+-- stale board copies after a server restart.
+CREATE TABLE IF NOT EXISTS "public"."lm_card_tombstone" (
+  "card_code" varchar(190) NOT NULL,
+  "board_code" varchar(190),
+  "time_create" timestamptz(6) DEFAULT now(),
+  PRIMARY KEY ("card_code")
+);
+
+-- ----------------------------
 -- 3. Table structure for lm_board_activity
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS "public"."lm_board_activity" (

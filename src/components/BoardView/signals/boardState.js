@@ -4884,9 +4884,14 @@ export const duplicateCard = (cardId) => {
   const maxZ = activeBoardSignal.value.cards.reduce((acc, c) => Math.max(acc, c.zIndex || 1), 1);
   const offset = snapToGridSignal.value ? 48 : 30;
 
+  // Deep clone and give the copy a fresh identity. Keeping the original's
+  // card_code (or shared nested objects) makes the server key the copy to
+  // the original's lm_board_card row, so the original follows the copy.
+  const new_id = createId('card');
   const duplicated = {
-    ...card,
-    id: createId('card'),
+    ...JSON.parse(JSON.stringify(card)),
+    id: new_id,
+    card_code: new_id,
     x: card.x + offset,
     y: card.y + offset,
     title: `${card.title} (Copy)`,
@@ -4986,9 +4991,12 @@ export const duplicateSelectedCards = () => {
     .filter((c) => selected_ids.includes(c.id))
     .forEach((card, idx) => {
       const new_id = createId('card');
+      // Fresh identity (new card_code) + deep clone, same as duplicateCard:
+      // reusing the original's card_code keys the copy to its DB row.
       const duplicated = {
-        ...card,
+        ...JSON.parse(JSON.stringify(card)),
         id: new_id,
+        card_code: new_id,
         x: card.x + offset,
         y: card.y + offset,
         title: card.title ? `${card.title} (Copy)` : 'Card (Copy)',

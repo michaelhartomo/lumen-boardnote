@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import os from 'os';
 import { Pool } from 'pg';
 import { v4 as uuidv4, v7 as uuidv7, v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
@@ -20,6 +19,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 import { spawn } from 'child_process';
+import { createHash } from 'crypto';
 import { createLumenMcpServer, execute_mcp_tool, LUMEN_MCP_TOOLS_SPEC } from './server/mcp/lumen_mcp_core.js';
 import {
   OWASP_LLM_LIMITS,
@@ -201,6 +201,7 @@ async function start_server() {
             console.log('[PostgreSQL] Existing lm_* database schema verified.');
           }
 
+          await load_card_tombstones();
           await sync_stores_on_startup();
         } catch (bg_err: any) {
           console.warn(`[PostgreSQL] Background initialization notice (${bg_err.message}). Falling back to local file storage.`);
@@ -662,6 +663,76 @@ async function start_server() {
   const deleted_board_ids = new Set<string>();
   const deleted_card_ids = new Set<string>();
 
+  // Card tombstones are also persisted in PostgreSQL (lm_card_tombstone).
+  // The in-memory set alone is lost on server restart, after which any
+  // stale board copy (another tab/device/local storage) silently
+  // re-inserted deleted cards on its next full-board save.
+  let card_tombstone_table_ready = false;
+  async function ensure_card_tombstone_table(): Promise<boolean> {
+    if (!pgPool) return false;
+    if (card_tombstone_table_ready) return true;
+    try {
+      await pgPool.query(
+        `CREATE TABLE IF NOT EXISTS lm_card_tombstone (
+           card_code varchar(190) NOT NULL,
+           board_code varchar(190),
+           time_create timestamptz(6) DEFAULT now(),
+           PRIMARY KEY (card_code)
+         )`
+      );
+      card_tombstone_table_ready = true;
+      return true;
+    } catch (err: any) {
+      console.warn('[PostgreSQL] Notice ensuring lm_card_tombstone table:', err.message);
+      return false;
+    }
+  }
+
+  async function persist_card_tombstones(ids: any[], board_code?: string): Promise<void> {
+    const clean = [...new Set((ids || []).map((s) => String(s || '').trim()).filter(Boolean))];
+    if (!clean.length || !(await ensure_card_tombstone_table())) return;
+    const pool = pgPool;
+    if (!pool) return;
+    try {
+      await pool.query(
+        `INSERT INTO lm_card_tombstone (card_code, board_code)
+         SELECT unnest($1::varchar[]), $2
+         ON CONFLICT (card_code) DO NOTHING`,
+        [clean, board_code || null]
+      );
+    } catch (err: any) {
+      console.warn('[PostgreSQL] Notice persisting card tombstones:', err.message);
+    }
+  }
+
+  async function clear_card_tombstones(ids: any[]): Promise<void> {
+    const clean = [...new Set((ids || []).map((s) => String(s || '').trim()).filter(Boolean))];
+    if (!clean.length || !(await ensure_card_tombstone_table())) return;
+    const pool = pgPool;
+    if (!pool) return;
+    try {
+      await pool.query('DELETE FROM lm_card_tombstone WHERE card_code = ANY($1::varchar[])', [clean]);
+    } catch (err: any) {
+      console.warn('[PostgreSQL] Notice clearing card tombstones:', err.message);
+    }
+  }
+
+  async function load_card_tombstones(): Promise<void> {
+    if (!(await ensure_card_tombstone_table())) return;
+    const pool = pgPool;
+    if (!pool) return;
+    try {
+      await pool.query(`DELETE FROM lm_card_tombstone WHERE time_create < NOW() - INTERVAL '90 days'`);
+      const res = await pool.query('SELECT card_code FROM lm_card_tombstone');
+      for (const row of res.rows || []) {
+        if (row.card_code) deleted_card_ids.add(String(row.card_code));
+      }
+      console.log(`[PostgreSQL] Loaded ${res.rows?.length || 0} deleted-card tombstones.`);
+    } catch (err: any) {
+      console.warn('[PostgreSQL] Notice loading card tombstones:', err.message);
+    }
+  }
+
   // PostgreSQL Persistence Helpers
   async function persist_board_to_postgres(boardId: string, boardData: any, retryCount = 0, lumenAuth?: any): Promise<boolean> {
     if (!pgPool || !boardId || boardId === '[object Object]' || boardId.includes('[object') || !boardData) {
@@ -740,15 +811,17 @@ async function start_server() {
       const board_uuid = (boardData.board_uuid && typeof boardData.board_uuid === 'string' && uuidValidate(boardData.board_uuid))
         ? boardData.board_uuid
         : uuidv7();
+      const time_modify = new Date();
 
       await pgPool.query(
         `INSERT INTO lm_board (
-           board_code, board_name, board_description, board_viewport,
+           board_uuid, board_code,
+           vendor_code, master_code, project_code, user_account,
+           board_name, board_description, board_viewport,
            board_connection, board_drawing, board_setting,
-           time_modify, time_create, board_uuid,
-           vendor_code, master_code, project_code, user_account
+           time_modify, time_create
          )
-         VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6::jsonb, $7::jsonb, NOW(), NOW(), COALESCE($8::uuid, uuidv7()), $9, $10, $11, $12)
+         VALUES ($1::uuid, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11::jsonb, $12::jsonb, $13::timestamptz, NOW())
          ON CONFLICT (board_code) DO UPDATE SET
            board_name = EXCLUDED.board_name,
            board_description = EXCLUDED.board_description,
@@ -756,28 +829,29 @@ async function start_server() {
            board_connection = EXCLUDED.board_connection,
            board_drawing = EXCLUDED.board_drawing,
            board_setting = CASE
-             WHEN (EXCLUDED.board_setting::jsonb) ? 'sharing' THEN EXCLUDED.board_setting::jsonb
-             WHEN (lm_board.board_setting::jsonb) ? 'sharing' THEN jsonb_set(EXCLUDED.board_setting::jsonb, '{sharing}', lm_board.board_setting->'sharing')
-             ELSE EXCLUDED.board_setting::jsonb
+             WHEN EXCLUDED.board_setting ? 'sharing' THEN EXCLUDED.board_setting
+             WHEN lm_board.board_setting ? 'sharing' THEN jsonb_set(EXCLUDED.board_setting, '{sharing}', lm_board.board_setting->'sharing')
+             ELSE EXCLUDED.board_setting
            END,
-           time_modify = NOW(),
+           time_modify = EXCLUDED.time_modify,
            vendor_code = COALESCE(NULLIF(EXCLUDED.vendor_code, ''), lm_board.vendor_code),
            master_code = COALESCE(NULLIF(EXCLUDED.master_code, ''), lm_board.master_code),
            project_code = COALESCE(NULLIF(EXCLUDED.project_code, ''), lm_board.project_code),
            user_account = COALESCE(NULLIF(EXCLUDED.user_account, ''), lm_board.user_account)`,
         [
+          board_uuid,
           board_code,
+          boardData.vendor_code,
+          boardData.master_code,
+          boardData.project_code,
+          boardData.user_account,
           board_name,
           board_description,
           JSON.stringify(board_viewport),
           JSON.stringify(board_connection),
           JSON.stringify(board_drawing),
           JSON.stringify(consolidated_setting),
-          board_uuid,
-          boardData.vendor_code,
-          boardData.master_code,
-          boardData.project_code,
-          boardData.user_account,
+          time_modify,
         ]
       );
 
@@ -1767,12 +1841,13 @@ async function start_server() {
       // Ensure board row exists in lm_board table first
       await pgPool.query(
         `INSERT INTO lm_board (
-           board_code, board_name, board_description, board_viewport,
+           board_uuid, board_code,
+           vendor_code, master_code, project_code, user_account,
+           board_name, board_description, board_viewport,
            board_connection, board_drawing, board_setting,
-           time_modify, time_create, board_uuid,
-           vendor_code, master_code, project_code, user_account
+           time_modify, time_create
          )
-         VALUES ($1, $2, '', '{"panX":0,"panY":0,"zoom":1}', '[]', '[]', '{}', NOW(), NOW(), uuidv7(), $3, $4, $5, $6)
+         VALUES (uuidv7(), $1, $3, $4, $5, $6, $2, '', '{"panX":0,"panY":0,"zoom":1}'::jsonb, '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, NOW(), NOW())
          ON CONFLICT (board_code) DO UPDATE SET
            vendor_code = COALESCE(EXCLUDED.vendor_code, lm_board.vendor_code),
            master_code = COALESCE(EXCLUDED.master_code, lm_board.master_code),
@@ -1848,7 +1923,18 @@ async function start_server() {
         if (!card || (!card.id && !card.card_code)) continue;
         const raw_cid = String(card.id || '');
         const raw_ccode = String(card.card_code || '');
-        const valid_card_code = get_canonical_card_id(card.card_code || card.id, board_code);
+        let valid_card_code = get_canonical_card_id(card.card_code || card.id, board_code);
+        // A duplicated card may arrive with a fresh id but the original's
+        // card_code still attached. Two distinct cards in one payload must
+        // never key to the same lm_board_card row (the copy would overwrite
+        // the original and the original would follow it), so fall back to
+        // the card's own id when its code is already claimed in this sync.
+        if (card_codes.includes(valid_card_code)) {
+          valid_card_code = get_canonical_card_id(card.id, board_code);
+          if (card_codes.includes(valid_card_code)) {
+            valid_card_code = uuidv4();
+          }
+        }
         if (
           deleted_card_ids.has(raw_cid) ||
           deleted_card_ids.has(raw_ccode) ||
@@ -1928,13 +2014,28 @@ async function start_server() {
         card.content = final_content;
         card.card_encryption = card_encryption;
 
+        // Record embedded (data-URL) card images in file storage so an
+        // uploaded board image appears in lm_file_storage / S3, not only
+        // as base64 inside the card row.
+        if (!is_card_encrypted) {
+          await extract_embedded_images_from_card(
+            card,
+            card_data,
+            board_code,
+            valid_card_code,
+            card.user_account || card_auth.user_account || 'user_guest',
+            card_auth
+          );
+        }
+
         await pgPool.query(
           `INSERT INTO lm_board_card (
-            card_uuid, card_code, board_code, card_type, card_name,
-            pos_x, pos_y, width, height, z_index, is_locked,
-            card_data, card_style, card_encryption, card_raw, time_modify,
-            vendor_code, master_code, project_code, user_account
-          ) VALUES (uuidv7(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), $15, $16, $17, $18)
+            card_uuid, card_code, board_code,
+            vendor_code, master_code, project_code, user_account,
+            card_type, card_name, pos_x, pos_y, width, height,
+            z_index, is_locked, card_data, card_style, card_raw,
+            card_encryption, time_modify, time_create
+          ) VALUES (uuidv7(), $1, $2, $15, $16, $17, $18, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $14, $13, NOW(), NOW())
           ON CONFLICT (card_code) DO UPDATE SET
             board_code = EXCLUDED.board_code,
             card_type = EXCLUDED.card_type,
@@ -1977,13 +2078,22 @@ async function start_server() {
         );
       }
 
-      // Preserve cards recently added/updated in DB by other users (within last 45s) unless explicitly deleted
+      // Preserve cards recently added/updated in DB by OTHER users (within
+      // last 45s) unless explicitly deleted. Same-owner cards omitted from
+      // a full-board save are deletions, not stale snapshots: preserving
+      // them made a just-deleted card immediately come back for its owner.
+      const saver_account = String(
+        extract_lumen_auth(lumenAuth || {}).user_account || ''
+      ).toLowerCase();
       const card_codes_set = new Set(card_codes);
       for (const [db_ccode, db_row] of existing_db_cards_map.entries()) {
         if (!card_codes_set.has(db_ccode) && !deleted_card_ids.has(db_ccode)) {
           const db_mod_raw = db_row.time_modify || db_row.time_modified;
           const db_mod_ms = db_mod_raw ? new Date(db_mod_raw).getTime() : 0;
-          if (db_mod_ms > 0 && Date.now() - db_mod_ms < 45000) {
+          const db_owner = String(db_row.user_account || '').toLowerCase();
+          const is_other_users_card =
+            db_owner !== '' && saver_account !== '' && db_owner !== saver_account;
+          if (is_other_users_card && db_mod_ms > 0 && Date.now() - db_mod_ms < 45000) {
             card_codes.push(db_ccode);
             card_codes_set.add(db_ccode);
             cards.push(reconstruct_db_card(db_row));
@@ -2235,12 +2345,13 @@ async function start_server() {
           // Ensure board row exists in lm_board table
           await pgPool.query(
             `INSERT INTO lm_board (
-               board_code, board_name, board_description, board_viewport,
+               board_uuid, board_code,
+               vendor_code, master_code, project_code, user_account,
+               board_name, board_description, board_viewport,
                board_connection, board_drawing, board_setting,
-               time_modify, time_create, board_uuid,
-               vendor_code, master_code, project_code, user_account
+               time_modify, time_create
              )
-             VALUES ($1, $2, '', '{"panX":0,"panY":0,"zoom":1}', '[]', '[]', '{}', NOW(), NOW(), uuidv7(), $3, $4, $5, $6)
+             VALUES (uuidv7(), $1, $3, $4, $5, $6, $2, '', '{"panX":0,"panY":0,"zoom":1}'::jsonb, '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, NOW(), NOW())
              ON CONFLICT (board_code) DO UPDATE SET
                time_modify = NOW(),
                vendor_code = COALESCE(EXCLUDED.vendor_code, lm_board.vendor_code),
@@ -2257,13 +2368,28 @@ async function start_server() {
             ]
           );
 
+          // Record embedded (data-URL) card images in file storage so an
+          // uploaded board image appears in lm_file_storage / S3, not only
+          // as base64 inside the card row.
+          if (!is_card_encrypted) {
+            await extract_embedded_images_from_card(
+              merged,
+              card_data,
+              target_board,
+              valid_card_id,
+              merged.user_account || auth_codes.user_account || 'user_guest',
+              auth_codes
+            );
+          }
+
           await pgPool.query(
             `INSERT INTO lm_board_card (
-              card_uuid, card_code, board_code, card_type, card_name,
-              pos_x, pos_y, width, height, z_index, is_locked,
-              card_data, card_style, card_encryption, card_raw, time_modify,
-              vendor_code, master_code, project_code, user_account
-            ) VALUES (uuidv7(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), $15, $16, $17, $18)
+              card_uuid, card_code, board_code,
+              vendor_code, master_code, project_code, user_account,
+              card_type, card_name, pos_x, pos_y, width, height,
+              z_index, is_locked, card_data, card_style, card_raw,
+              card_encryption, time_modify, time_create
+            ) VALUES (uuidv7(), $1, $2, $15, $16, $17, $18, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $14, $13, NOW(), NOW())
             ON CONFLICT (card_code) DO UPDATE SET
               card_type = EXCLUDED.card_type,
               card_name = EXCLUDED.card_name,
@@ -2453,6 +2579,8 @@ async function start_server() {
       } catch (err: any) {
         console.warn(`[PostgreSQL] Delete card notice for ${valid_card_id}:`, err.message);
       }
+      // Durable tombstone so the deletion survives server restarts.
+      await persist_card_tombstones([card_id, valid_card_id], target_board || board_code);
     }
 
     if (!target_board) {
@@ -3522,30 +3650,15 @@ Guidelines:
 
     fs.writeFileSync(filePath, buffer);
 
-    const { client: s3Client, config: s3Config } = get_s3_client();
-    let s3_key: string | null = null;
-    let s3_bucket: string | null = null;
-    let s3_endpoint: string | null = null;
-
     const target_owner = owner_account || 'user_guest';
     const target_uploader = uploader_account || target_owner;
 
-    if (s3Client && s3Config.is_configured) {
-      try {
-        s3_bucket = s3Config.bucket;
-        s3_endpoint = s3Config.endpoint;
-        s3_key = `${s3Config.startingPath}/${target_owner}/${target_board_id || 'ai_assets'}/${diskFileName}`;
-        await s3Client.send(
-          new PutObjectCommand({
-            Bucket: s3Config.bucket,
-            Key: s3_key,
-            Body: buffer,
-            ContentType: detected_mime,
-            ACL: 'public-read',
-          })
-        );
-      } catch (_s3_err: any) {}
-    }
+    const { config: s3Config } = get_s3_client();
+    const { s3_key, s3_bucket, s3_endpoint } = await upload_buffer_to_s3({
+      key: `${s3Config.startingPath}/${target_owner}/${target_board_id || 'ai_assets'}/${diskFileName}`,
+      body: buffer,
+      contentType: detected_mime,
+    });
 
     const download_url = `/api/files/download/${fileId}`;
     const view_url = `/api/files/view/${fileId}`;
@@ -3568,7 +3681,7 @@ Guidelines:
              s3_endpoint = EXCLUDED.s3_endpoint,
              time_modify = NOW()`,
           [
-            generate_uuidv7(),
+            uuidv7(),
             fileId,
             auth_codes?.vendor_code || null,
             auth_codes?.master_code || null,
@@ -3610,6 +3723,198 @@ Guidelines:
       downloadUrl: download_url,
       fileSize: buffer.length,
     };
+  }
+
+  // Images added to a board as image cards (drag-drop, paste, carousel
+  // upload) arrive embedded as base64 data URLs inside the card and were
+  // never sent to file storage: no S3 object and no lm_file_storage row.
+  // Store each embedded image exactly like an uploaded file and rewrite
+  // the slide to its view URL. The fileId is deterministic (uuidv5 of
+  // board + card + slide + content hash) so re-saving the same card does
+  // not create duplicate storage rows.
+  const EMBEDDED_IMAGE_UUID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+
+  async function store_embedded_card_image(
+    data_url: string,
+    target_board_id: string | null,
+    card_code: string,
+    slide_id: string,
+    file_name_base: string,
+    owner_account: string,
+    auth_codes?: any
+  ): Promise<{ fileId: string; viewUrl: string } | null> {
+    const match = String(data_url || '').match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/s);
+    if (!match) return null;
+    const mime = match[1].toLowerCase();
+    const buffer = Buffer.from(match[2].replace(/\s+/g, ''), 'base64');
+    if (buffer.length < 32) return null;
+
+    const ext_map: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+      'image/svg+xml': 'svg',
+      'image/bmp': 'bmp',
+      'image/avif': 'avif',
+    };
+    const ext = ext_map[mime] || 'png';
+    const content_hash = createHash('sha256').update(buffer).digest('hex');
+    const fileId = uuidv5(
+      `${target_board_id || ''}:${card_code}:${slide_id}:${content_hash}`,
+      EMBEDDED_IMAGE_UUID_NAMESPACE
+    );
+    const clean_base = (file_name_base || 'board_image').replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 48) || 'board_image';
+    const clean_name = `${clean_base}.${ext}`;
+    const diskFileName = `${fileId}_${clean_name}`;
+    const filePath = path.join(uploads_dir, diskFileName);
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).size !== buffer.length) {
+      fs.writeFileSync(filePath, buffer);
+    }
+
+    const { config: s3Config } = get_s3_client();
+    const { s3_key, s3_bucket, s3_endpoint } = await upload_buffer_to_s3({
+      key: `${s3Config.startingPath}/${owner_account}/${target_board_id || 'general'}/${diskFileName}`,
+      body: buffer,
+      contentType: mime,
+    });
+
+    const download_url = `/api/files/download/${fileId}`;
+    const view_url = `/api/files/view/${fileId}`;
+
+    if (pgPool) {
+      try {
+        await pgPool.query(
+          `INSERT INTO lm_file_storage (
+             file_storage_uuid, file_storage_code, vendor_code, master_code, project_code, user_account,
+             file_name, file_type, file_size,
+             s3_key, s3_bucket, s3_endpoint, view_url, download_url,
+             board_code, time_create, time_modify
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW(), NOW())
+           ON CONFLICT (file_storage_code) DO UPDATE SET
+             file_name = EXCLUDED.file_name,
+             file_type = EXCLUDED.file_type,
+             file_size = EXCLUDED.file_size,
+             s3_key = EXCLUDED.s3_key,
+             s3_bucket = EXCLUDED.s3_bucket,
+             s3_endpoint = EXCLUDED.s3_endpoint,
+             time_modify = NOW()`,
+          [
+            uuidv7(),
+            fileId,
+            auth_codes?.vendor_code || null,
+            auth_codes?.master_code || null,
+            auth_codes?.project_code || null,
+            owner_account,
+            clean_name,
+            mime,
+            buffer.length,
+            s3_key,
+            s3_bucket,
+            s3_endpoint,
+            view_url,
+            download_url,
+            target_board_id || null,
+          ]
+        );
+      } catch (db_err: any) {
+        console.warn('[Database] Notice saving embedded card image to lm_file_storage:', db_err.message);
+      }
+    }
+
+    const manifest = get_manifest();
+    manifest[fileId] = {
+      fileId,
+      file_storage_code: fileId,
+      fileName: clean_name,
+      fileType: mime,
+      fileSize: buffer.length,
+      diskFileName,
+      s3Key: s3_key,
+      ownerAccount: owner_account,
+      uploaderAccount: owner_account,
+      boardId: target_board_id || null,
+      uploadedAt: Date.now(),
+    };
+    save_manifest(manifest);
+
+    return { fileId, viewUrl: view_url };
+  }
+
+  // Rewrite every data-URL image on a card (slides + cover) to stored
+  // files. Mutates both the raw card object and its built card_data.
+  async function extract_embedded_images_from_card(
+    card_obj: any,
+    card_data: any,
+    target_board_id: string | null,
+    card_code: string,
+    owner_account: string,
+    auth_codes?: any
+  ): Promise<boolean> {
+    if (!card_obj && !card_data) return false;
+    let changed = false;
+    const stored_by_url = new Map<string, { fileId: string; viewUrl: string }>();
+
+    const resolve_url = async (url: string, slide_id: string, caption: string) => {
+      if (typeof url !== 'string' || !url.startsWith('data:image/')) return null;
+      if (!stored_by_url.has(url)) {
+        const stored = await store_embedded_card_image(
+          url,
+          target_board_id,
+          card_code,
+          slide_id,
+          caption || slide_id || 'board_image',
+          owner_account,
+          auth_codes
+        ).catch((err: any) => {
+          console.warn('[Storage] Notice storing embedded card image:', err?.message || err);
+          return null;
+        });
+        if (stored) stored_by_url.set(url, stored);
+      }
+      return stored_by_url.get(url) || null;
+    };
+
+    const holders = [card_obj, card_data].filter((h) => h && typeof h === 'object');
+    for (const holder of holders) {
+      if (Array.isArray(holder.images)) {
+        for (let i = 0; i < holder.images.length; i++) {
+          const slide = holder.images[i];
+          const slide_url = typeof slide === 'string' ? slide : slide?.url;
+          if (typeof slide_url !== 'string') continue;
+          const stored = await resolve_url(
+            slide_url,
+            String((typeof slide === 'object' && slide?.id) || `slide_${i}`),
+            String((typeof slide === 'object' && (slide?.caption || slide?.name)) || holder.caption || holder.title || 'board_image')
+          );
+          if (stored) {
+            if (typeof slide === 'string') {
+              holder.images[i] = stored.viewUrl;
+            } else {
+              slide.url = stored.viewUrl;
+              slide.file_id = stored.fileId;
+              slide.fileId = stored.fileId;
+              slide.file_storage_code = stored.fileId;
+            }
+            changed = true;
+          }
+        }
+      }
+      for (const key of ['imageUrl', 'image_url']) {
+        if (typeof holder[key] === 'string' && holder[key].startsWith('data:image/')) {
+          const stored = await resolve_url(holder[key], 'cover', String(holder.caption || holder.title || 'board_image'));
+          if (stored) {
+            holder[key] = stored.viewUrl;
+            holder.file_id = stored.fileId;
+            holder.fileId = stored.fileId;
+            holder.file_storage_code = stored.fileId;
+            changed = true;
+          }
+        }
+      }
+    }
+    return changed;
   }
 
   function extract_muse_base64_from_response(payload: any): string | null {
@@ -8927,12 +9232,17 @@ Instructions by Action ID:
 
   function get_s3_config() {
     const raw_endpoint = (process.env.S3_ENDPOINT || '').trim();
-    const region = (process.env.S3_REGION || 'nyc3').trim();
     const accessKeyId = (process.env.S3_ACCESS_KEY_ID || '').trim();
     const secretAccessKey = (process.env.S3_SECRET_ACCESS_KEY || '').trim();
     const bucket = (process.env.S3_BUCKET || '').trim();
     const startingPath = (process.env.S3_STARTING_PATH || 'uploads').replace(/^\/+|\/+$/g, '');
     const publicUrl = (process.env.S3_PUBLIC_URL || '').replace(/\/+$/, '');
+    // Optional canned ACL. Empty (default) sends no ACL header: buckets with
+    // Object Ownership = BucketOwnerEnforced (AWS default since Apr 2023)
+    // reject any PutObject that carries an ACL. Only set S3_OBJECT_ACL
+    // (e.g. "public-read") for legacy buckets/Spaces that require it.
+    const objectAcl = (process.env.S3_OBJECT_ACL || '').trim();
+    const forcePathStyle = /^(1|true|yes)$/i.test((process.env.S3_FORCE_PATH_STYLE || '').trim());
     const defaultLimitMb = Math.max(
       1,
       Number(
@@ -8941,12 +9251,16 @@ Instructions by Action ID:
       )
     );
 
-    let endpoint = raw_endpoint;
+    let endpoint = raw_endpoint.replace(/\/+$/, '');
     if (endpoint && !endpoint.startsWith('http://') && !endpoint.startsWith('https://')) {
       endpoint = `https://${endpoint}`;
     }
 
-    const is_configured = Boolean(accessKeyId && secretAccessKey && bucket && endpoint);
+    // Endpoint is optional: with no custom endpoint the SDK targets AWS S3
+    // in `region`. Previously an upload was silently local-only unless an
+    // endpoint was set, even with a valid bucket + credentials.
+    const region = (process.env.S3_REGION || '').trim() || (endpoint ? 'nyc3' : 'us-east-1');
+    const is_configured = Boolean(accessKeyId && secretAccessKey && bucket);
 
     return {
       endpoint,
@@ -8956,6 +9270,8 @@ Instructions by Action ID:
       bucket,
       startingPath,
       publicUrl,
+      objectAcl,
+      forcePathStyle,
       defaultLimitMb,
       defaultLimitGb: Number((defaultLimitMb / 1024).toFixed(2)),
       is_configured,
@@ -8963,28 +9279,98 @@ Instructions by Action ID:
   }
 
   let cached_s3_client: S3Client | null = null;
+  let cached_s3_fingerprint = '';
   function get_s3_client(): { client: S3Client | null; config: ReturnType<typeof get_s3_config> } {
     const config = get_s3_config();
     if (!config.is_configured) {
       return { client: null, config };
     }
-    if (!cached_s3_client) {
+    // Rebuild the client if the effective config changed instead of serving
+    // a stale client built from earlier credentials/endpoint forever.
+    const fingerprint = [
+      config.endpoint,
+      config.region,
+      config.bucket,
+      config.accessKeyId,
+      config.secretAccessKey,
+      String(config.forcePathStyle),
+    ].join('|');
+    if (!cached_s3_client || cached_s3_fingerprint !== fingerprint) {
       try {
         cached_s3_client = new S3Client({
-          endpoint: config.endpoint,
+          ...(config.endpoint ? { endpoint: config.endpoint } : {}),
           region: config.region,
           credentials: {
             accessKeyId: config.accessKeyId,
             secretAccessKey: config.secretAccessKey,
           },
-          forcePathStyle: false,
+          forcePathStyle: config.forcePathStyle,
+          // SDK >= 3.729 otherwise attaches a default CRC32 checksum to
+          // PutObject, which several S3-compatible stores reject. Only send
+          // checksums when the API operation requires them.
+          requestChecksumCalculation: 'WHEN_REQUIRED',
+          responseChecksumValidation: 'WHEN_REQUIRED',
         });
+        cached_s3_fingerprint = fingerprint;
       } catch (err: any) {
-        console.warn('[S3/Spaces Initialization Error]:', err.message);
+        console.warn('[S3/Spaces Initialization Error]:', err?.name || '', err?.message || err);
         cached_s3_client = null;
+        cached_s3_fingerprint = '';
       }
     }
     return { client: cached_s3_client, config };
+  }
+
+  function describe_s3_error(err: any): string {
+    if (!err) return 'Unknown S3 error';
+    const code = err.Code || err.code || err.name || 'Error';
+    const status = err.$metadata?.httpStatusCode ? ` HTTP ${err.$metadata.httpStatusCode}` : '';
+    return `${code}${status}: ${err.message || String(err)}`;
+  }
+
+  // Single PutObject path for every upload site. The s3_* fields stay null
+  // unless the object was actually stored, so callers never persist a
+  // phantom key for an upload the bucket rejected.
+  async function upload_buffer_to_s3(params: {
+    key: string;
+    body: Buffer;
+    contentType: string;
+  }): Promise<{
+    s3_key: string | null;
+    s3_bucket: string | null;
+    s3_endpoint: string | null;
+    s3_uploaded: boolean;
+    s3_error: string | null;
+  }> {
+    const { client: s3Client, config: s3Config } = get_s3_client();
+    if (!s3Client || !s3Config.is_configured) {
+      return { s3_key: null, s3_bucket: null, s3_endpoint: null, s3_uploaded: false, s3_error: null };
+    }
+    const key = params.key.replace(/\/{2,}/g, '/').replace(/^\/+/, '');
+    try {
+      await s3Client.send(
+        new PutObjectCommand({
+          Bucket: s3Config.bucket,
+          Key: key,
+          Body: params.body,
+          ContentLength: params.body.length,
+          ContentType: params.contentType || 'application/octet-stream',
+          ...(s3Config.objectAcl ? { ACL: s3Config.objectAcl as any } : {}),
+        })
+      );
+      console.log(`[Storage] Uploaded object to S3 bucket "${s3Config.bucket}": ${key}`);
+      return {
+        s3_key: key,
+        s3_bucket: s3Config.bucket,
+        s3_endpoint: s3Config.endpoint || null,
+        s3_uploaded: true,
+        s3_error: null,
+      };
+    } catch (err: any) {
+      const described = describe_s3_error(err);
+      console.warn(`[S3 Upload Failed] bucket="${s3Config.bucket}" key="${key}": ${described}`);
+      return { s3_key: null, s3_bucket: null, s3_endpoint: null, s3_uploaded: false, s3_error: described };
+    }
   }
 
   // Resolve the board owner account to charge storage quota
@@ -9071,7 +9457,7 @@ Instructions by Action ID:
          ON CONFLICT (vendor_code, master_code, project_code, user_account, setting_type, setting_key) DO UPDATE SET
            setting_value = EXCLUDED.setting_value,
            time_modify = NOW()`,
-        [generate_uuidv7(), vendor, master, project, user_account, setting_key, String(setting_value).trim()]
+        [uuidv7(), vendor, master, project, user_account, setting_key, String(setting_value).trim()]
       );
       return true;
     } catch (err: any) {
@@ -9255,7 +9641,7 @@ Instructions by Action ID:
     // Fallback to S3 / DigitalOcean Spaces stream
     if (meta.s3Key) {
       const { client: s3Client, config: s3Config } = get_s3_client();
-      if (s3Client && s3Config.bucket) {
+      if (s3Client && (meta.s3Bucket || s3Config.bucket)) {
         try {
           const obj = await s3Client.send(
             new GetObjectCommand({
@@ -9265,7 +9651,7 @@ Instructions by Action ID:
           );
           return { meta, filePath: null, stream: obj.Body as Readable };
         } catch (e: any) {
-          console.warn('[Storage] Error reading object from S3/Spaces:', e.message);
+          console.warn('[Storage] Error reading object from S3/Spaces:', describe_s3_error(e));
         }
       }
     }
@@ -9614,31 +10000,6 @@ Instructions by Action ID:
     return '';
   }
 
-  const MUSE_TEXT_MAX_CONCURRENT = 3;
-  let muse_text_active_count = 0;
-  const muse_text_wait_queue: Array<() => void> = [];
-
-  const acquire_muse_text_slot = (): Promise<void> => {
-    if (muse_text_active_count < MUSE_TEXT_MAX_CONCURRENT) {
-      muse_text_active_count += 1;
-      return Promise.resolve();
-    }
-    return new Promise<void>((resolve) => {
-      muse_text_wait_queue.push(() => {
-        muse_text_active_count += 1;
-        resolve();
-      });
-    });
-  };
-
-  const release_muse_text_slot = () => {
-    muse_text_active_count = Math.max(0, muse_text_active_count - 1);
-    const next_waiter = muse_text_wait_queue.shift();
-    if (next_waiter) {
-      next_waiter();
-    }
-  };
-
   async function generate_text_with_muse(
     prompt_text: string,
     preferred_model?: string,
@@ -9695,130 +10056,112 @@ Instructions by Action ID:
       message_content.push({ image_url: image_data_url, type: 'input_image' });
     }
 
-    await acquire_muse_text_slot();
-    try {
-      // A 200 OK can still carry no answer: status "incomplete" with reason
-      // "max_output_tokens" means the budget was consumed before a message
-      // item was emitted (observed for HTML coding: 8192 output tokens,
-      // output_types ["reasoning"], no text). Retry that case once at the
-      // maximum budget, keeping the caller's reasoning effort (high stays
-      // high): quality is not traded for completion. If the API rejects
-      // the maximum budget, clamp down once and retry.
-      let attempt_max_tokens = effective_max_tokens;
-      for (let attempt = 0; attempt < 3; attempt++) {
-        // Multimodal (input_image) requests use standard sampling
-        // (temperature/top_p) with reasoning capped at low effort: at high
-        // effort reasoning consumes the entire token budget and the response
-        // ends incomplete with no message text. Text-only keeps caller effort.
-        const request_body: Record<string, any> = {
-          input: [{ content: message_content, role: 'user', type: 'message' }],
-          max_output_tokens: attempt_max_tokens,
-          model: muse_model,
-          store: has_multimodal_image,
-          stream: false,
-        };
-        if (has_multimodal_image) {
-          request_body.temperature = resolved_temp;
-          request_body.top_p = 0.95;
-          request_body.reasoning = { effort: 'low' };
-        } else {
-          request_body.reasoning = { effort: resolved_effort };
-        }
+    // A 200 OK can still carry no answer: status "incomplete" with reason
+    // "max_output_tokens" means the budget was consumed before a message
+    // item was emitted (observed for HTML coding: 8192 output tokens,
+    // output_types ["reasoning"], no text). Retry that case once at the
+    // maximum budget, keeping the caller's reasoning effort (high stays
+    // high): quality is not traded for completion. If the API rejects
+    // the maximum budget, clamp down once and retry. Timeouts are not
+    // retried.
+    let attempt_max_tokens = effective_max_tokens;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      // Multimodal (input_image) requests use standard sampling
+      // (temperature/top_p) with reasoning capped at low effort: at high
+      // effort reasoning consumes the entire token budget and the response
+      // ends incomplete with no message text. Text-only keeps caller effort.
+      const request_body: Record<string, any> = {
+        input: [{ content: message_content, role: 'user', type: 'message' }],
+        max_output_tokens: attempt_max_tokens,
+        model: muse_model,
+        store: has_multimodal_image,
+        stream: false,
+      };
+      if (has_multimodal_image) {
+        request_body.temperature = resolved_temp;
+        request_body.top_p = 0.95;
+        // Reasoning expands to fill the whole token budget at high effort
+        // (observed: 4094/4096 reasoning tokens, status incomplete, no text).
+        // These multimodal outputs are short (an improved prompt, a vision
+        // blueprint), so cap reasoning at low to leave room for the answer.
+        request_body.reasoning = { effort: 'low' };
+      } else {
+        request_body.reasoning = { effort: resolved_effort };
+      }
 
-        try {
-          const resp = await fetch(muse_url, {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${muse_key}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(request_body),
-            signal: AbortSignal.timeout(resolved_timeout),
-          });
-          if (!resp.ok) {
-            const err_body = await resp.text().catch(() => '');
-            const budget_rejected =
-              /max_output_tokens/i.test(err_body) &&
-              attempt_max_tokens > MUSE_FALLBACK_OUTPUT_TOKENS;
-            if (budget_rejected && attempt < 2) {
-              attempt_max_tokens = MUSE_FALLBACK_OUTPUT_TOKENS;
-              console.log(
-                `[AI Debug] generate_text_with_muse (${muse_model}) rejected max_output_tokens=${request_body.max_output_tokens}; retrying with max_output_tokens=${attempt_max_tokens}, reasoning.effort="${has_multimodal_image ? 'low' : resolved_effort}".`
-              );
-              continue;
-            }
-            if (
-              attempt < 2 &&
-              (resp.status === 429 ||
-                resp.status === 502 ||
-                resp.status === 503 ||
-                resp.status === 504)
-            ) {
-              await new Promise((r) => setTimeout(r, 350 * (attempt + 1)));
-              continue;
-            }
+      try {
+        const resp = await fetch(muse_url, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${muse_key}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request_body),
+          signal: AbortSignal.timeout(resolved_timeout),
+        });
+        if (!resp.ok) {
+          const err_body = await resp.text().catch(() => '');
+          const budget_rejected =
+            /max_output_tokens/i.test(err_body) &&
+            attempt_max_tokens > MUSE_FALLBACK_OUTPUT_TOKENS;
+          if (budget_rejected && attempt < 2) {
+            attempt_max_tokens = MUSE_FALLBACK_OUTPUT_TOKENS;
             console.log(
-              `[AI Debug] generate_text_with_muse (${muse_model}) HTTP ${resp.status}:`,
-              err_body.slice(0, 320)
+              `[AI Debug] generate_text_with_muse (${muse_model}) rejected max_output_tokens=${request_body.max_output_tokens}; retrying with max_output_tokens=${attempt_max_tokens}, reasoning.effort="${has_multimodal_image ? 'low' : resolved_effort}".`
             );
-            return null;
-          }
-          const data: any = await resp.json().catch(() => null);
-          const extracted = extract_text_from_muse_response(data);
-          if (!extracted) {
-            console.log(
-              `[AI Debug] generate_text_with_muse (${muse_model}) returned 200 OK with empty output.`,
-              JSON.stringify({
-                status: data?.status || null,
-                incomplete_details: data?.incomplete_details || null,
-                usage: data?.usage || null,
-                output_types: Array.isArray(data?.output)
-                  ? data.output.map((o: any) => o?.type || 'unknown')
-                  : [],
-              }).slice(0, 320)
-            );
-            const truncated_by_tokens =
-              data?.status === 'incomplete' &&
-              data?.incomplete_details?.reason === 'max_output_tokens';
-            if (
-              truncated_by_tokens &&
-              attempt < 2 &&
-              attempt_max_tokens < MUSE_MAX_OUTPUT_TOKENS
-            ) {
-              attempt_max_tokens = MUSE_MAX_OUTPUT_TOKENS;
-              console.log(
-                `[AI Debug] generate_text_with_muse (${muse_model}) truncated by max_output_tokens at ${request_body.max_output_tokens}; retrying with max_output_tokens=${attempt_max_tokens}, reasoning.effort="${has_multimodal_image ? 'low' : resolved_effort}".`
-              );
-              continue;
-            }
-            return null;
-          }
-          console.log(
-            has_multimodal_image
-              ? `[AI Model Usage] Function: generate_text_with_muse | Active Model Used: ${muse_model} (/v1/responses standard) | Status: SUCCESS | Quality: HIGH (temperature=${resolved_temp}, top_p=0.95, max_output_tokens=${request_body.max_output_tokens})`
-              : `[AI Model Usage] Function: generate_text_with_muse | Active Model Used: ${muse_model} (/v1/responses) | Status: SUCCESS | Quality: HIGH (reasoning.effort="${resolved_effort}")`
-          );
-          return extracted;
-        } catch (err: any) {
-          const err_str = `${err?.name || ''} ${err?.message || err || ''}`;
-          const is_transient_net_err =
-            !/timeout|abort/i.test(err_str) &&
-            /fetch failed|econnreset|etimedout|socket|und_err|network/i.test(err_str);
-          if (is_transient_net_err && attempt < 2) {
-            await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
             continue;
           }
           console.log(
-            `[AI Debug] generate_text_with_muse (${muse_model}) error:`,
-            err?.message || err
+            `[AI Debug] generate_text_with_muse (${muse_model}) HTTP ${resp.status}:`,
+            err_body.slice(0, 320)
           );
           return null;
         }
+        const data: any = await resp.json().catch(() => null);
+        const extracted = extract_text_from_muse_response(data);
+        if (!extracted) {
+          console.log(
+            `[AI Debug] generate_text_with_muse (${muse_model}) returned 200 OK with empty output.`,
+            JSON.stringify({
+              status: data?.status || null,
+              incomplete_details: data?.incomplete_details || null,
+              usage: data?.usage || null,
+              output_types: Array.isArray(data?.output)
+                ? data.output.map((o: any) => o?.type || 'unknown')
+                : [],
+            }).slice(0, 320)
+          );
+          const truncated_by_tokens =
+            data?.status === 'incomplete' &&
+            data?.incomplete_details?.reason === 'max_output_tokens';
+          if (
+            truncated_by_tokens &&
+            attempt < 2 &&
+            attempt_max_tokens < MUSE_MAX_OUTPUT_TOKENS
+          ) {
+            attempt_max_tokens = MUSE_MAX_OUTPUT_TOKENS;
+            console.log(
+              `[AI Debug] generate_text_with_muse (${muse_model}) truncated by max_output_tokens at ${request_body.max_output_tokens}; retrying with max_output_tokens=${attempt_max_tokens}, reasoning.effort="${has_multimodal_image ? 'low' : resolved_effort}".`
+            );
+            continue;
+          }
+          return null;
+        }
+        console.log(
+          has_multimodal_image
+            ? `[AI Model Usage] Function: generate_text_with_muse | Active Model Used: ${muse_model} (/v1/responses standard) | Status: SUCCESS | Quality: HIGH (temperature=${resolved_temp}, top_p=0.95, max_output_tokens=${request_body.max_output_tokens})`
+            : `[AI Model Usage] Function: generate_text_with_muse | Active Model Used: ${muse_model} (/v1/responses) | Status: SUCCESS | Quality: HIGH (reasoning.effort="${resolved_effort}")`
+        );
+        return extracted;
+      } catch (err: any) {
+        console.log(
+          `[AI Debug] generate_text_with_muse (${muse_model}) error:`,
+          err?.message || err
+        );
+        return null;
       }
-      return null;
-    } finally {
-      release_muse_text_slot();
     }
+    return null;
   }
 
   function needs_extra_creativity_with_muse_glimmer(
@@ -10199,137 +10542,136 @@ Instructions by Action ID:
     return handshake;
   }
 
-  async function run_ffmpeg_audio_convert(
-    audio_buffer: Buffer,
-    output_format: 's16le' | 'wav',
-    min_bytes: number,
-    timeout_ms: number
-  ): Promise<Buffer | null> {
-    const run_with_input = (input_arg: string, pipe_input: Buffer | null): Promise<Buffer | null> =>
-      new Promise((resolve) => {
-        try {
-          const ff = spawn(
-            'ffmpeg',
-            [
-              '-hide_banner',
-              '-loglevel',
-              'error',
-              '-fflags',
-              '+genpts+igndts',
-              '-err_detect',
-              'ignore_err',
-              '-i',
-              input_arg,
-              '-f',
-              output_format,
-              '-acodec',
-              'pcm_s16le',
-              '-ac',
-              String(MUSE_VOICE_CHANNELS),
-              '-ar',
-              String(MUSE_VOICE_SAMPLE_RATE),
-              'pipe:1',
-            ],
-            { stdio: [pipe_input ? 'pipe' : 'ignore', 'pipe', 'ignore'] }
-          );
-          const out_chunks: Buffer[] = [];
-          let finished = false;
-          const done = (res: Buffer | null) => {
-            if (finished) return;
-            finished = true;
-            resolve(res);
-          };
-          const timeout_id = setTimeout(() => {
-            try {
-              ff.kill('SIGKILL');
-            } catch {}
-            done(out_chunks.length > 0 ? Buffer.concat(out_chunks) : null);
-          }, timeout_ms);
-
-          ff.stdout.on('data', (chunk: Buffer) => {
-            out_chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-          });
-          ff.on('error', () => {
-            clearTimeout(timeout_id);
-            done(null);
-          });
-          ff.on('close', () => {
-            clearTimeout(timeout_id);
-            const total = out_chunks.length > 0 ? Buffer.concat(out_chunks) : null;
-            if (total && total.length >= min_bytes) {
-              if (output_format === 'wav') {
-                // Fix piped WAV RIFF & data chunk sizes so upstream ASR parsers see exact byte lengths instead of 0xFFFFFFFF
-                try {
-                  if (
-                    total.toString('ascii', 0, 4) === 'RIFF' &&
-                    total.toString('ascii', 8, 12) === 'WAVE'
-                  ) {
-                    total.writeUInt32LE(Math.max(0, total.length - 8), 4);
-                    const data_idx = total.indexOf(Buffer.from('data'), 12);
-                    if (data_idx !== -1 && data_idx < 256 && data_idx + 8 <= total.length) {
-                      total.writeUInt32LE(Math.max(0, total.length - data_idx - 8), data_idx + 4);
-                    }
-                  }
-                } catch {}
-              }
-              done(total);
-            } else {
-              done(null);
-            }
-          });
-          if (pipe_input && ff.stdin) {
-            ff.stdin.on('error', () => {});
-            ff.stdin.write(pipe_input);
-            ff.stdin.end();
-          }
-        } catch {
-          resolve(null);
-        }
-      });
-
-    // 1. Fast path via stdin pipe
-    const piped = await run_with_input('pipe:0', audio_buffer);
-    if (piped && piped.length >= min_bytes) {
-      return piped;
-    }
-
-    // 2. Seekable temp file fallback (needed for MP4/M4A moov atoms or unindexed WebM fragments)
-    const tmp_path = path.join(
-      os.tmpdir(),
-      `lumen_audio_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.bin`
-    );
-    try {
-      await fs.promises.writeFile(tmp_path, audio_buffer);
-      const from_file = await run_with_input(tmp_path, null);
-      if (from_file && from_file.length >= min_bytes) {
-        return from_file;
-      }
-    } catch {
-      // ignore temp file error
-    } finally {
-      fs.promises.unlink(tmp_path).catch(() => {});
-    }
-
-    // 3. If output_format is wav and input is already a valid RIFF WAVE buffer, return it directly
-    if (
-      output_format === 'wav' &&
-      audio_buffer.length >= 128 &&
-      audio_buffer.toString('ascii', 0, 4) === 'RIFF' &&
-      audio_buffer.toString('ascii', 8, 12) === 'WAVE'
-    ) {
-      return audio_buffer;
-    }
-    return null;
-  }
-
   async function convert_audio_buffer_to_pcm24k(audio_buffer: Buffer): Promise<Buffer | null> {
     if (!audio_buffer || audio_buffer.length < 64) return null;
-    return run_ffmpeg_audio_convert(audio_buffer, 's16le', 320, 15000);
+    return new Promise((resolve) => {
+      try {
+        const ff = spawn(
+          'ffmpeg',
+          [
+            '-hide_banner',
+            '-loglevel',
+            'error',
+            '-i',
+            'pipe:0',
+            '-f',
+            's16le',
+            '-acodec',
+            'pcm_s16le',
+            '-ac',
+            String(MUSE_VOICE_CHANNELS),
+            '-ar',
+            String(MUSE_VOICE_SAMPLE_RATE),
+            'pipe:1',
+          ],
+          { stdio: ['pipe', 'pipe', 'ignore'] }
+        );
+        const out_chunks: Buffer[] = [];
+        let finished = false;
+        const done = (res: Buffer | null) => {
+          if (finished) return;
+          finished = true;
+          resolve(res);
+        };
+        const timeout_id = setTimeout(() => {
+          try {
+            ff.kill('SIGKILL');
+          } catch {}
+          done(out_chunks.length > 0 ? Buffer.concat(out_chunks) : null);
+        }, 15000);
+
+        ff.stdout.on('data', (chunk: Buffer) => {
+          out_chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        });
+        ff.on('error', () => {
+          clearTimeout(timeout_id);
+          done(null);
+        });
+        ff.on('close', () => {
+          clearTimeout(timeout_id);
+          const total = out_chunks.length > 0 ? Buffer.concat(out_chunks) : null;
+          done(total && total.length >= 320 ? total : null);
+        });
+        ff.stdin.on('error', () => {});
+        ff.stdin.write(audio_buffer);
+        ff.stdin.end();
+      } catch {
+        resolve(null);
+      }
+    });
   }
 
   async function convert_audio_buffer_to_wav24k(audio_buffer: Buffer): Promise<Buffer | null> {
     if (!audio_buffer || audio_buffer.length < 64) return null;
-    return run_ffmpeg_audio_convert(audio_buffer, 'wav', 128, 20000);
+    return new Promise((resolve) => {
+      try {
+        const ff = spawn(
+          'ffmpeg',
+          [
+            '-hide_banner',
+            '-loglevel',
+            'error',
+            '-i',
+            'pipe:0',
+            '-f',
+            'wav',
+            '-acodec',
+            'pcm_s16le',
+            '-ac',
+            String(MUSE_VOICE_CHANNELS),
+            '-ar',
+            String(MUSE_VOICE_SAMPLE_RATE),
+            'pipe:1',
+          ],
+          { stdio: ['pipe', 'pipe', 'ignore'] }
+        );
+        const out_chunks: Buffer[] = [];
+        let finished = false;
+        const done = (res: Buffer | null) => {
+          if (finished) return;
+          finished = true;
+          resolve(res);
+        };
+        const timeout_id = setTimeout(() => {
+          try {
+            ff.kill('SIGKILL');
+          } catch {}
+          done(out_chunks.length > 0 ? Buffer.concat(out_chunks) : null);
+        }, 20000);
+
+        ff.stdout.on('data', (chunk: Buffer) => {
+          out_chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        });
+        ff.on('error', () => {
+          clearTimeout(timeout_id);
+          done(null);
+        });
+        ff.on('close', () => {
+          clearTimeout(timeout_id);
+          const total = out_chunks.length > 0 ? Buffer.concat(out_chunks) : null;
+          if (total && total.length >= 128) {
+            // Fix piped WAV RIFF & data chunk sizes so upstream ASR parsers see exact byte lengths instead of 0xFFFFFFFF
+            try {
+              if (total.toString('ascii', 0, 4) === 'RIFF' && total.toString('ascii', 8, 12) === 'WAVE') {
+                total.writeUInt32LE(Math.max(0, total.length - 8), 4);
+                const data_idx = total.indexOf(Buffer.from('data'), 12);
+                if (data_idx !== -1 && data_idx < 256 && data_idx + 8 <= total.length) {
+                  total.writeUInt32LE(Math.max(0, total.length - data_idx - 8), data_idx + 4);
+                }
+              }
+            } catch {}
+            done(total);
+          } else {
+            done(null);
+          }
+        });
+        ff.stdin.on('error', () => {});
+        ff.stdin.write(audio_buffer);
+        ff.stdin.end();
+      } catch {
+        resolve(null);
+      }
+    });
   }
 
   function wrap_pcm24k_in_wav_header(pcm_buffer: Buffer): Buffer {
@@ -10407,31 +10749,19 @@ Instructions by Action ID:
 
     // Sync to S3 / DigitalOcean Spaces and PostgreSQL lm_file_storage in the background so multi-MB WAV responses return immediately
     (async () => {
-      const { client: s3Client, config: s3Config } = get_s3_client();
-      let s3_key: string | null = null;
-      let s3_bucket: string | null = null;
-      let s3_endpoint: string | null = null;
+      const { config: s3Config } = get_s3_client();
+      const { s3_key, s3_bucket, s3_endpoint, s3_uploaded } = await upload_buffer_to_s3({
+        key: `${s3Config.startingPath}/${target_owner}/${target_board_id || 'ai_audio'}/${diskFileName}`,
+        body: buffer,
+        contentType: detected_mime,
+      });
 
-      if (s3Client && s3Config.is_configured) {
-        try {
-          s3_bucket = s3Config.bucket;
-          s3_endpoint = s3Config.endpoint;
-          s3_key = `${s3Config.startingPath}/${target_owner}/${target_board_id || 'ai_audio'}/${diskFileName}`;
-          await s3Client.send(
-            new PutObjectCommand({
-              Bucket: s3Config.bucket,
-              Key: s3_key,
-              Body: buffer,
-              ContentType: detected_mime,
-              ACL: 'public-read',
-            })
-          );
-          const cur_manifest = get_manifest();
-          if (cur_manifest[fileId]) {
-            cur_manifest[fileId].s3Key = s3_key;
-            save_manifest(cur_manifest);
-          }
-        } catch {}
+      if (s3_uploaded && s3_key) {
+        const cur_manifest = get_manifest();
+        if (cur_manifest[fileId]) {
+          cur_manifest[fileId].s3Key = s3_key;
+          save_manifest(cur_manifest);
+        }
       }
 
       if (pgPool) {
@@ -10452,7 +10782,7 @@ Instructions by Action ID:
                s3_endpoint = EXCLUDED.s3_endpoint,
                time_modify = NOW()`,
             [
-              generate_uuidv7(),
+              uuidv7(),
               fileId,
               auth_codes?.vendor_code || null,
               auth_codes?.master_code || null,
@@ -10868,7 +11198,12 @@ Instructions by Action ID:
     return String(raw_text || '')
       .replace(/\biOSOS\b/g, 'iOS')
       .replace(/\b(\w+%)\s+\1\b/gi, '$1')
-      .replace(/\b([A-Za-z]{2,})([.!?])\s+\1\b/gi, '$1$2')
+      .replace(/\b(\w+(?:\s+\w+){1,4})\s+\1\b/gi, '$1')
+      .replace(/\b([A-Za-z]{2,})([.!?])?\s+\1([.!?])?/gi, (full, word, punct1, punct2) => {
+        const lower = String(word).toLowerCase();
+        if (lower === 'had' && !punct1 && !punct2) return full;
+        return `${word}${punct1 || punct2 || ''}`;
+      })
       .replace(/\s{2,}/g, ' ')
       .trim();
   }
@@ -10993,23 +11328,21 @@ Instructions by Action ID:
     };
 
     try {
-      let active_payload: Record<string, any> = { ...request_payload };
-      let resp = await post_muse_voice_transcribe(active_payload);
+      let resp = await post_muse_voice_transcribe(request_payload);
 
       if (
         !resp.ok &&
-        Array.isArray(active_payload.languageBias) &&
-        active_payload.languageBias.length > 0
+        Array.isArray(request_payload.languageBias) &&
+        request_payload.languageBias.length > 0
       ) {
         const rejected_body = await resp.text().catch(() => '');
         const { languageBias: _dropped_bias, ...payload_without_bias } =
-          active_payload;
-        active_payload = payload_without_bias;
+          request_payload;
         console.log(
           `[AI Debug] transcribe_recording_with_muse_voice_file HTTP ${resp.status} with languageBias ${JSON.stringify(request_payload.languageBias)}; retrying without languageBias.`,
           rejected_body.slice(0, 320)
         );
-        resp = await post_muse_voice_transcribe(active_payload);
+        resp = await post_muse_voice_transcribe(payload_without_bias);
       }
 
       if (!resp.ok) {
@@ -11021,35 +11354,9 @@ Instructions by Action ID:
         return null;
       }
 
-      let result: any = await resp.json().catch(() => null);
+      const result: any = await resp.json().catch(() => null);
       if (!result || typeof result !== 'object') {
         return null;
-      }
-
-      // If DIARIZATION mode returned neither turns nor transcript on a valid audio buffer,
-      // retry once in CONVERSATION mode so single-speaker or short utterances are not missed.
-      const initial_turns = Array.isArray(result.turns) ? result.turns : [];
-      const initial_transcript = String(result.transcript || '').trim();
-      if (
-        initial_turns.length === 0 &&
-        !initial_transcript &&
-        active_payload.mode === 'DIARIZATION'
-      ) {
-        const conv_resp = await post_muse_voice_transcribe({
-          ...active_payload,
-          mode: 'CONVERSATION',
-        }).catch(() => null);
-        if (conv_resp && conv_resp.ok) {
-          const conv_json: any = await conv_resp.json().catch(() => null);
-          if (
-            conv_json &&
-            typeof conv_json === 'object' &&
-            ((Array.isArray(conv_json.turns) && conv_json.turns.length > 0) ||
-              String(conv_json.transcript || '').trim())
-          ) {
-            result = conv_json;
-          }
-        }
       }
 
       // Read every field defensively exactly as in transcribe_file.py:
@@ -11115,97 +11422,26 @@ Instructions by Action ID:
       }
 
       const raw_transcript = clean_asr_boundary_stutters(String(result.transcript || '').trim());
-      const turns_joined_text = turns.map((t) => t.transcript).join(' ').trim();
-
-      // If `result.turns` is empty OR `result.turns` only captured a fraction of `result.transcript`
-      // (which can happen when speaker diarization drops low-confidence segments), preserve the full `raw_transcript`!
-      if (
-        raw_transcript &&
-        (turns.length === 0 ||
-          (detected_labels_set.size <= 1 &&
-            turns_joined_text.length < raw_transcript.length * 0.82 &&
-            raw_transcript.length - turns_joined_text.length >= 12))
-      ) {
-        turns.length = 0;
-        const spk = map_label_to_speaker(
-          detected_labels_set.size === 1 ? Array.from(detected_labels_set)[0] : 'A'
-        );
+      if (turns.length === 0 && raw_transcript) {
+        const spk = map_label_to_speaker('A');
         detected_labels_set.add(spk.speakerLabel);
-        const sentences = raw_transcript
-          .split(/(?<=[.!?。！？])\s+/)
-          .map((s) => s.trim())
-          .filter(Boolean);
-        if (sentences.length > 1 && audio_duration_ms >= 5000) {
-          const total_chars = Math.max(
-            1,
-            sentences.reduce((acc, s) => acc + s.length, 0)
-          );
-          let cum_chars = 0;
-          for (const sentence of sentences) {
-            const seg_start_ms = Math.round((cum_chars / total_chars) * audio_duration_ms);
-            cum_chars += sentence.length;
-            const seg_end_ms = Math.round((cum_chars / total_chars) * audio_duration_ms);
-            turns.push({
-              speakerLabel: spk.speakerLabel,
-              speakerRole: spk.speakerRole,
-              speakerName: spk.speakerName,
-              transcript: sentence,
-              audioProcessedMs: seg_end_ms,
-              startMs: seg_start_ms,
-              endMs: seg_end_ms,
-              timestamp: format_ms_to_mm_ss(seg_start_ms),
-            });
-          }
-        } else {
-          turns.push({
-            speakerLabel: spk.speakerLabel,
-            speakerRole: spk.speakerRole,
-            speakerName: spk.speakerName,
-            transcript: raw_transcript,
-            audioProcessedMs: audio_duration_ms,
-            startMs: 0,
-            endMs: audio_duration_ms,
-            timestamp: '00:00',
-          });
-        }
-      } else if (
-        raw_transcript &&
-        turns.length > 0 &&
-        turns_joined_text.length < raw_transcript.length * 0.85 &&
-        raw_transcript.length - turns_joined_text.length >= 16
-      ) {
-        // Multi-speaker turns exist, but raw_transcript has trailing or leading words omitted from turns
-        const norm_joined = turns_joined_text.toLowerCase();
-        const norm_raw = raw_transcript.toLowerCase();
-        const last_turn = turns[turns.length - 1];
-        const first_turn = turns[0];
-        if (norm_raw.startsWith(norm_joined)) {
-          const missing_tail = raw_transcript.slice(turns_joined_text.length).trim();
-          if (missing_tail && last_turn) {
-            last_turn.transcript = `${last_turn.transcript} ${missing_tail}`.trim();
-          }
-        } else if (norm_raw.endsWith(norm_joined)) {
-          const missing_head = raw_transcript
-            .slice(0, raw_transcript.length - turns_joined_text.length)
-            .trim();
-          if (missing_head && first_turn) {
-            first_turn.transcript = `${missing_head} ${first_turn.transcript}`.trim();
-          }
-        }
+        turns.push({
+          speakerLabel: spk.speakerLabel,
+          speakerRole: spk.speakerRole,
+          speakerName: spk.speakerName,
+          transcript: raw_transcript,
+          audioProcessedMs: audio_duration_ms,
+          startMs: 0,
+          endMs: audio_duration_ms,
+          timestamp: '00:00',
+        });
       }
 
       if (turns.length === 0) {
-        return {
-          transcript: '',
-          rawTranscript: '',
-          turns: [],
-          speakerCount: 0,
-          detectedSpeakerLabels: [],
-          detectedSpeakers: [],
-          audioDurationMs: audio_duration_ms,
-          audioDurationSeconds: Number((audio_duration_ms / 1000).toFixed(1)),
-          sessionId: String(result.sessionId || ''),
-        };
+        console.log(
+          '[AI Debug] transcribe_recording_with_muse_voice_file: ASR returned no transcript turns (silence or unrecognized response shape).'
+        );
+        return null;
       }
 
       const detected_labels = Array.from(detected_labels_set);
@@ -11763,12 +11999,7 @@ Instructions by Action ID:
           const muse_file_res = await transcribe_recording_with_muse_voice_file(audio_buf, {
             mode: 'DIARIZATION',
           });
-          const muse_voice_res =
-            muse_file_res && muse_file_res.transcript.trim()
-              ? muse_file_res
-              : await transcribe_audio_with_muse_voice_stream(audio_buf, {
-                  mode: 'DIARIZATION',
-                });
+          const muse_voice_res = muse_file_res;
           if (muse_voice_res && muse_voice_res.transcript.trim()) {
             detected_speaker_count = muse_voice_res.speakerCount;
             detected_speakers_list = muse_voice_res.detectedSpeakers;
@@ -12389,15 +12620,6 @@ Instructions by Action ID:
         if (normalize_lang_match(src_lang, target_lang)) {
           return clean;
         }
-        // For interim word-by-word live preview banners (previewOnly: true),
-        // use the low-latency live translation service first so we don't fire
-        // 6+ concurrent muse-wonder-1.0 calls per spoken sentence.
-        if (previewOnly) {
-          const fast_live_tr = await translate_text_with_live_service(clean, target_lang);
-          if (fast_live_tr.translatedText) {
-            return fast_live_tr.translatedText;
-          }
-        }
         if (is_muse_requested) {
           // Live turns must return fast: low reasoning is enough to
           // translate one short utterance, and a 20s cap lets the fast
@@ -12410,6 +12632,12 @@ Instructions by Action ID:
           );
           if (muse_tr && muse_tr.trim()) {
             return muse_tr.trim();
+          }
+        }
+        if (previewOnly) {
+          const fast_live_tr = await translate_text_with_live_service(clean, target_lang);
+          if (fast_live_tr.translatedText) {
+            return fast_live_tr.translatedText;
           }
         }
         const live_tr = await translate_text_with_live_service(clean, target_lang);
@@ -12550,11 +12778,12 @@ Instructions by Action ID:
                 }),
                 new Promise<null>((resolve) => setTimeout(() => resolve(null), 30000)),
               ]);
-              if (!muse_res) {
+              if (!muse_res || muse_res.turns.length === 0) {
                 console.log(
                   '[AI Debug] Muse Voice live meeting turn returned no transcript (ASR failure, conversion failure, or 30s timeout).'
                 );
-              } else if (muse_res.turns.length > 0) {
+              }
+              if (muse_res && muse_res.turns.length > 0) {
                 muse_detected_speaker_count = muse_res.speakerCount;
                 muse_detected_speakers = muse_res.detectedSpeakers;
                 for (const mt of muse_res.turns) {
@@ -12575,10 +12804,13 @@ Instructions by Action ID:
             }
           }
 
-          // For live meeting audio chunks with no recognizable speech (or unrecognised transient noise),
-          // treat as silence instead of failing with HTTP 502 so the live session continues uninterrupted.
+          // No transcript from Muse Voice and no client spokenText to
+          // fall back to: fail closed instead of substituting Gemini.
           if (diarized_raw_turns.length === 0 && !clean_transcript) {
-            return res.json({ ok: true, isSilence: true });
+            return res.status(502).json({
+              ok: false,
+              error: 'Muse Voice transcription failed. Please try again.',
+            });
           }
         }
       }
@@ -13149,7 +13381,7 @@ Instructions by Action ID:
              download_count = lm_bandwidth_usage.download_count + EXCLUDED.download_count,
              blocked_hotlink_count = lm_bandwidth_usage.blocked_hotlink_count + EXCLUDED.blocked_hotlink_count,
              time_modify = NOW()`,
-          [generate_uuidv7(), owner_account, auto_bytes, dl_bytes, up_bytes, cdn_bytes, auto_cnt, dl_cnt, hotlink_cnt]
+          [uuidv7(), owner_account, auto_bytes, dl_bytes, up_bytes, cdn_bytes, auto_cnt, dl_cnt, hotlink_cnt]
         );
 
         if (file_id) {
@@ -13250,32 +13482,24 @@ Instructions by Action ID:
       await remux_audio_file_for_finite_duration(filePath, `${fileType || ''} ${fileName || ''}`);
       const final_disk_buffer = fs.existsSync(filePath) ? fs.readFileSync(filePath) : buffer;
 
-      // S3 / DigitalOcean Spaces upload
-      const { client: s3Client, config: s3Config } = get_s3_client();
-      let s3_key: string | null = null;
-      let s3_bucket: string | null = null;
-      let s3_endpoint: string | null = null;
-
-      if (s3Client && s3Config.is_configured) {
-        try {
-          s3_bucket = s3Config.bucket;
-          s3_endpoint = s3Config.endpoint;
-          // Starting path format: <S3_STARTING_PATH>/<owner_account>/<board_id>/<fileId>_<safeFileName>
-          s3_key = `${s3Config.startingPath}/${owner_account}/${target_board_id || 'general'}/${diskFileName}`;
-          
-          await s3Client.send(
-            new PutObjectCommand({
-              Bucket: s3Config.bucket,
-              Key: s3_key,
-              Body: final_disk_buffer,
-              ContentType: fileType || 'application/octet-stream',
-              ACL: 'public-read',
-            })
-          );
-          console.log(`[Storage] Uploaded ${fileId} to DigitalOcean Spaces: ${s3_key}`);
-        } catch (s3_err: any) {
-          console.warn('[DigitalOcean Spaces Upload Notice]: Failed to put object to spaces, retained on local disk:', s3_err.message);
-        }
+      // S3 / DigitalOcean Spaces upload. Only a verified PutObject sets
+      // s3_key; a rejected upload stays local-only and is reported below
+      // instead of persisting a key for an object that does not exist.
+      const { config: s3ConfigForUpload } = get_s3_client();
+      const {
+        s3_key,
+        s3_bucket,
+        s3_endpoint,
+        s3_uploaded,
+        s3_error: s3_upload_error,
+      } = await upload_buffer_to_s3({
+        // Starting path format: <S3_STARTING_PATH>/<owner_account>/<board_id>/<fileId>_<safeFileName>
+        key: `${s3ConfigForUpload.startingPath}/${owner_account}/${target_board_id || 'general'}/${diskFileName}`,
+        body: final_disk_buffer,
+        contentType: fileType || 'application/octet-stream',
+      });
+      if (s3ConfigForUpload.is_configured && !s3_uploaded) {
+        console.warn(`[Storage] File ${fileId} retained on local disk only; S3 upload failed: ${s3_upload_error}`);
       }
 
       const download_url = `/api/files/download/${fileId}`;
@@ -13299,7 +13523,7 @@ Instructions by Action ID:
                s3_endpoint = EXCLUDED.s3_endpoint,
                time_modify = NOW()`,
             [
-              generate_uuidv7(),
+              uuidv7(),
               fileId,
               auth_codes.vendor_code || null,
               auth_codes.master_code || null,
@@ -13431,6 +13655,11 @@ Instructions by Action ID:
         fileUrl: download_url,
         viewUrl: view_url,
         s3Key: s3_key,
+        s3Uploaded: s3_uploaded,
+        s3Configured: s3ConfigForUpload.is_configured,
+        ...(s3ConfigForUpload.is_configured && !s3_uploaded
+          ? { storageWarning: `S3 upload failed; file retained on local disk only. ${s3_upload_error || ''}`.trim() }
+          : {}),
         ownerAccount: owner_account,
         storage: {
           owner_account,
@@ -13621,31 +13850,20 @@ Instructions by Action ID:
       const limit_mb = (storage_limit_bytes / (1024 ** 2)).toFixed(0);
 
       // S3 / DigitalOcean Spaces upload using stream/buffer
-      const { client: s3Client, config: s3Config } = get_s3_client();
-      let s3_key: string | null = null;
-      let s3_bucket: string | null = null;
-      let s3_endpoint: string | null = null;
-
-      if (s3Client && s3Config.is_configured) {
-        try {
-          s3_bucket = s3Config.bucket;
-          s3_endpoint = s3Config.endpoint;
-          s3_key = `${s3Config.startingPath}/${owner_account}/${target_board_id || 'general'}/${cleanDiskName}`;
-          const fileBuffer = fs.readFileSync(filePath);
-
-          await s3Client.send(
-            new PutObjectCommand({
-              Bucket: s3Config.bucket,
-              Key: s3_key,
-              Body: fileBuffer,
-              ContentType: fileType || 'application/octet-stream',
-              ACL: 'public-read',
-            })
-          );
-          console.log(`[Storage] Uploaded chunked file ${fileId} to DigitalOcean Spaces: ${s3_key}`);
-        } catch (s3_err: any) {
-          console.warn('[DigitalOcean Spaces Upload Notice]: Failed to put chunked object to spaces, retained on local disk:', s3_err.message);
-        }
+      const { config: s3ConfigForUpload } = get_s3_client();
+      const {
+        s3_key,
+        s3_bucket,
+        s3_endpoint,
+        s3_uploaded,
+        s3_error: s3_upload_error,
+      } = await upload_buffer_to_s3({
+        key: `${s3ConfigForUpload.startingPath}/${owner_account}/${target_board_id || 'general'}/${cleanDiskName}`,
+        body: fs.readFileSync(filePath),
+        contentType: fileType || 'application/octet-stream',
+      });
+      if (s3ConfigForUpload.is_configured && !s3_uploaded) {
+        console.warn(`[Storage] Chunked file ${fileId} retained on local disk only; S3 upload failed: ${s3_upload_error}`);
       }
 
       const download_url = `/api/files/download/${fileId}`;
@@ -13668,7 +13886,7 @@ Instructions by Action ID:
                s3_endpoint = EXCLUDED.s3_endpoint,
                time_modify = NOW()`,
             [
-              generate_uuidv7(),
+              uuidv7(),
               fileId,
               auth_codes.vendor_code || null,
               auth_codes.master_code || null,
@@ -13726,6 +13944,11 @@ Instructions by Action ID:
         fileUrl: download_url,
         viewUrl: view_url,
         s3Key: s3_key,
+        s3Uploaded: s3_uploaded,
+        s3Configured: s3ConfigForUpload.is_configured,
+        ...(s3ConfigForUpload.is_configured && !s3_uploaded
+          ? { storageWarning: `S3 upload failed; file retained on local disk only. ${s3_upload_error || ''}`.trim() }
+          : {}),
         ownerAccount: owner_account,
         storage: {
           owner_account,
@@ -14760,7 +14983,7 @@ Instructions by Action ID:
              blocked_quota_count = lm_ai_usage.blocked_quota_count + EXCLUDED.blocked_quota_count,
              time_modify = NOW()`,
           [
-            generate_uuidv7(),
+            uuidv7(),
             owner_account,
             tot_tokens,
             p_tokens,
@@ -15209,7 +15432,7 @@ Instructions by Action ID:
           );
           console.log(`[Storage] Deleted ${s3_key} from DigitalOcean Spaces`);
         } catch (e: any) {
-          console.warn('[Storage] Error deleting S3/Spaces object:', e.message);
+          console.warn('[Storage] Error deleting S3/Spaces object:', describe_s3_error(e));
         }
       }
     }
@@ -16665,6 +16888,13 @@ Instructions by Action ID:
           deleted_card_ids.add(get_canonical_card_id(d_cid, boardId));
         }
       }
+      // Durable tombstones so these deletions survive server restarts.
+      persist_card_tombstones(
+        req.body.deleted_card_ids.flatMap((d_cid: any) =>
+          d_cid ? [String(d_cid), get_canonical_card_id(d_cid, boardId)] : []
+        ),
+        boardId
+      ).catch(() => {});
     }
 
     const check = await verify_request_board_access(req, boardId, 'edit', req.body);
@@ -17105,6 +17335,8 @@ Instructions by Action ID:
     card.id = get_canonical_card_id(card.id, boardId);
     deleted_card_ids.delete(raw_card_id);
     deleted_card_ids.delete(card.id);
+    // Explicit re-add of a card also clears its durable tombstone.
+    clear_card_tombstones([raw_card_id, card.id]).catch(() => {});
     const auth_codes = check.auth;
 
     const created = await patch_card_in_postgres(card.id, card, boardId, auth_codes);
@@ -20168,52 +20400,8 @@ Instructions by Action ID:
     };
 
     let silence_finalize_timer: ReturnType<typeof setTimeout> | null = null;
-    let speech_end_finalize_timer: ReturnType<typeof setTimeout> | null = null;
-    let end_stream_drain_timer: ReturnType<typeof setTimeout> | null = null;
     let last_emitted_turn_text = '';
     let last_emitted_turn_ms = 0;
-    let last_segment_enqueued_ms = 0;
-    let last_enqueued_norm_text = '';
-    let last_enqueued_ms = 0;
-
-    const reset_if_upstream_started_new_turn = (incoming_text: string) => {
-      const clean_in = String(incoming_text || '').trim();
-      if (!clean_in || !emitted_turn_prefix) return;
-      // If the incoming cumulative transcript from upstream is shorter than what we already emitted,
-      // upstream has started a fresh turn without sending a separate reset event.
-      if (clean_in.length < emitted_turn_prefix.length * 0.8) {
-        emitted_turn_prefix = '';
-        return;
-      }
-      // Or if the first 10 characters no longer match the emitted prefix at all, upstream started a new utterance.
-      const check_len = Math.min(10, emitted_turn_prefix.length, clean_in.length);
-      if (
-        check_len >= 3 &&
-        clean_in.slice(0, check_len).toLowerCase() !==
-          emitted_turn_prefix.slice(0, check_len).toLowerCase()
-      ) {
-        emitted_turn_prefix = '';
-      }
-    };
-
-    const strip_emitted_prefix_from_cumulative = (full_text: string): string => {
-      const clean_full = String(full_text || '').trim();
-      if (!clean_full) return '';
-      if (emitted_turn_prefix) {
-        if (clean_full.startsWith(emitted_turn_prefix)) {
-          return clean_full.slice(emitted_turn_prefix.length).trim();
-        }
-        const lower_full = clean_full.toLowerCase();
-        const lower_prefix = emitted_turn_prefix.toLowerCase();
-        if (lower_full.startsWith(lower_prefix)) {
-          return clean_full.slice(emitted_turn_prefix.length).trim();
-        }
-        if (clean_full === emitted_turn_prefix || lower_full === lower_prefix) {
-          return '';
-        }
-      }
-      return clean_full;
-    };
 
     const build_live_turn_payload = async (
       raw_turn_text: string,
@@ -20221,22 +20409,39 @@ Instructions by Action ID:
       turn_id_override?: any,
       is_final_turn: boolean = true
     ): Promise<Record<string, any> | null> => {
+      if (silence_finalize_timer) {
+        clearTimeout(silence_finalize_timer);
+        silence_finalize_timer = null;
+      }
       let turn_text = clean_asr_boundary_stutters(String(raw_turn_text || '').trim());
+      // Upstream partials are cumulative: drop any prefix already
+      // emitted as a mid-speech segment so it is never translated twice.
+      // Segment tasks arrive pre-sliced, so they skip this stripping.
+      if (is_final_turn && emitted_turn_prefix) {
+        if (turn_text.startsWith(emitted_turn_prefix)) {
+          turn_text = turn_text.slice(emitted_turn_prefix.length).trim();
+        } else if (emitted_turn_prefix.startsWith(turn_text)) {
+          emitted_turn_prefix = '';
+          latest_partial_transcript = '';
+          prev_transcript = '';
+          return null;
+        }
+      }
+      // Segment (non-final) tasks must not clear the partial: the
+      // caller already stored the un-emitted remainder there.
+      if (is_final_turn) {
+        latest_partial_transcript = '';
+        prev_transcript = '';
+      }
       if (!turn_text) {
+        if (is_final_turn) emitted_turn_prefix = '';
         return null;
       }
+      if (is_final_turn) emitted_turn_prefix = '';
 
-      // Deduplicate identical consecutive turn emissions within 1.2s
+      // Deduplicate identical consecutive turn emissions within 1.5s
       const now_ms = Date.now();
-      const norm_turn = turn_text.toLowerCase().replace(/[^a-z0-9\u00c0-\uffff]+/gi, ' ').trim();
-      const norm_last = last_emitted_turn_text
-        .toLowerCase()
-        .replace(/[^a-z0-9\u00c0-\uffff]+/gi, ' ')
-        .trim();
-      if (
-        (turn_text === last_emitted_turn_text || (norm_turn && norm_turn === norm_last)) &&
-        now_ms - last_emitted_turn_ms < 1200
-      ) {
+      if (turn_text === last_emitted_turn_text && now_ms - last_emitted_turn_ms < 1500) {
         return null;
       }
       last_emitted_turn_text = turn_text;
@@ -20317,7 +20522,7 @@ Instructions by Action ID:
     // runs off the upstream transcript path: a few segments translate
     // in parallel, but turnComplete events are emitted strictly in
     // enqueue order so the conversation never appears out of sequence.
-    const LIVE_TURN_TRANSLATION_CONCURRENCY = 2;
+    const LIVE_TURN_TRANSLATION_CONCURRENCY = 3;
     let live_turn_seq_next = 0;
     let live_turn_seq_emit = 0;
     let live_turn_active = 0;
@@ -20398,46 +20603,13 @@ Instructions by Action ID:
       turn_id_override?: any,
       is_final_turn: boolean = true
     ) => {
-      if (silence_finalize_timer) {
-        clearTimeout(silence_finalize_timer);
-        silence_finalize_timer = null;
-      }
-      if (speech_end_finalize_timer) {
-        clearTimeout(speech_end_finalize_timer);
-        speech_end_finalize_timer = null;
-      }
-
-      // Synchronously strip any prefix already emitted as a mid-speech segment
-      // and clear state before pushing to the queue so speechEnd / speechComplete
-      // or rapid partials never enqueue duplicate translation jobs.
-      const effective_text = is_final_turn
-        ? strip_emitted_prefix_from_cumulative(raw_turn_text)
-        : String(raw_turn_text || '').trim();
-
-      if (is_final_turn) {
-        latest_partial_transcript = '';
-        prev_transcript = '';
-        emitted_turn_prefix = '';
-      }
-
-      const cleaned = clean_asr_boundary_stutters(effective_text);
-      if (!cleaned) return;
-
-      const norm = cleaned.toLowerCase().replace(/[^a-z0-9\u00c0-\uffff]+/gi, ' ').trim();
-      const now_ms = Date.now();
-      if (norm && norm === last_enqueued_norm_text && now_ms - last_enqueued_ms < 1200) {
-        return;
-      }
-      last_enqueued_norm_text = norm;
-      last_enqueued_ms = now_ms;
-
       live_turn_jobs.push({
         seq: live_turn_seq_next,
-        raw_turn_text: cleaned,
+        raw_turn_text,
         audio_ms,
         turn_id_override,
         is_final_turn,
-        enqueued_at: now_ms,
+        enqueued_at: Date.now(),
       });
       live_turn_seq_next += 1;
       pump_live_turns();
@@ -20547,7 +20719,6 @@ Instructions by Action ID:
             }
           } else if (mtype === 'transcript') {
             const text_val = String(msg.transcript || '');
-            reset_if_upstream_started_new_turn(text_val);
             let delta = text_val;
             if (text_val.startsWith(prev_transcript)) {
               delta = text_val.slice(prev_transcript.length);
@@ -20567,38 +20738,34 @@ Instructions by Action ID:
               }
               const spk = map_speaker_label(current_speaker_label);
               const summary = get_detected_speakers_summary();
-              const unemitted_preview = strip_emitted_prefix_from_cumulative(text_val);
-              if (unemitted_preview || msg.final) {
-                send_to_client({
-                  type: 'transcript',
-                  transcript: unemitted_preview || text_val,
-                  delta,
-                  final: Boolean(msg.final),
-                  speakerLabel: spk.speakerLabel,
-                  speakerRole: spk.speakerRole,
-                  speakerName: spk.speakerName,
-                  audioProcessedMs: msg.audioProcessedMs || last_audio_ms,
-                  ...summary,
-                });
-              }
+              send_to_client({
+                type: 'transcript',
+                transcript: text_val,
+                delta,
+                final: Boolean(msg.final),
+                speakerLabel: spk.speakerLabel,
+                speakerRole: spk.speakerRole,
+                speakerName: spk.speakerName,
+                audioProcessedMs: msg.audioProcessedMs || last_audio_ms,
+                ...summary,
+              });
 
               if (msg.final && text_val.trim()) {
                 enqueue_live_turn(
                   text_val,
                   msg.audioProcessedMs || last_audio_ms,
-                  msg.turnId,
-                  true
+                  msg.turnId
                 );
               } else if (text_val.trim()) {
                 // Continuous speech: emit complete sentences as their
-                // own translated turns when a clear sentence boundary is reached
-                const remainder_text = strip_emitted_prefix_from_cumulative(text_val);
+                // own translated turns instead of waiting for a pause,
+                // so one long monologue does not become a single batch.
+                const remainder_text =
+                  emitted_turn_prefix && text_val.startsWith(emitted_turn_prefix)
+                    ? text_val.slice(emitted_turn_prefix.length)
+                    : text_val;
                 const remainder_words = remainder_text.trim().split(/\s+/).filter(Boolean);
-                const now_seg_ms = Date.now();
-                if (
-                  now_seg_ms - last_segment_enqueued_ms >= 1600 &&
-                  (remainder_text.length >= 64 || remainder_words.length >= 12)
-                ) {
+                if (remainder_text.length >= 48 || remainder_words.length >= 9) {
                   const boundaries = [
                     ...remainder_text.matchAll(/[.!?。！？]["')\]]?\s+/g),
                   ];
@@ -20606,42 +20773,35 @@ Instructions by Action ID:
                   let cut = last_boundary
                     ? (last_boundary.index || 0) + last_boundary[0].length
                     : -1;
-                  if (cut < 32 && (remainder_text.length >= 160 || remainder_words.length >= 26)) {
+                  if (cut < 24 && (remainder_text.length >= 140 || remainder_words.length >= 22)) {
                     const last_space = remainder_text.lastIndexOf(' ');
-                    cut = last_space > 32 ? last_space + 1 : -1;
+                    cut = last_space > 24 ? last_space + 1 : -1;
                   }
                   if (cut > 0) {
                     const segment_text = remainder_text.slice(0, cut).trim();
                     if (segment_text) {
-                      emitted_turn_prefix = emitted_turn_prefix
-                        ? `${emitted_turn_prefix} ${segment_text}`.trim()
-                        : segment_text;
-                      last_segment_enqueued_ms = now_seg_ms;
-                      enqueue_live_turn(
-                        segment_text,
-                        msg.audioProcessedMs || last_audio_ms,
-                        undefined,
-                        false
+                      // Bookkeeping is synchronous so a final turn
+                      // arriving during translation strips this prefix.
+                      emitted_turn_prefix = text_val.slice(
+                        0,
+                        text_val.length - remainder_text.length + cut
                       );
+                      latest_partial_transcript = remainder_text.slice(cut);
+                      enqueue_live_turn(segment_text, msg.audioProcessedMs || last_audio_ms, undefined, false);
                     }
                   }
                 }
                 if (silence_finalize_timer) clearTimeout(silence_finalize_timer);
+                const snapshot_text = text_val;
                 const snapshot_ms = msg.audioProcessedMs || last_audio_ms;
                 silence_finalize_timer = setTimeout(() => {
-                  const unemitted = strip_emitted_prefix_from_cumulative(
-                    latest_partial_transcript
-                  );
-                  if (unemitted.trim()) {
-                    emitted_turn_prefix = latest_partial_transcript.trim();
+                  if (latest_partial_transcript.trim()) {
                     enqueue_live_turn(
-                      unemitted,
-                      snapshot_ms,
-                      undefined,
-                      false
+                      latest_partial_transcript || snapshot_text,
+                      snapshot_ms
                     );
                   }
-                }, 2200);
+                }, 1050);
               }
             }
           } else if (mtype === 'speechEnd') {
@@ -20650,36 +20810,20 @@ Instructions by Action ID:
               turnId: msg.turnId,
               audioProcessedMs: msg.audioProcessedMs || last_audio_ms,
             });
-            // Wait up to 850ms for the authoritative `speechComplete` message (which carries
-            // the final decoded words of the utterance). If `speechComplete` does not arrive,
-            // flush whatever unemitted partial transcript remains.
-            if (speech_end_finalize_timer) clearTimeout(speech_end_finalize_timer);
-            const end_ms = msg.audioProcessedMs || last_audio_ms;
-            const end_turn_id = msg.turnId;
-            speech_end_finalize_timer = setTimeout(() => {
-              speech_end_finalize_timer = null;
-              if (latest_partial_transcript.trim()) {
-                enqueue_live_turn(
-                  latest_partial_transcript,
-                  end_ms,
-                  end_turn_id,
-                  true
-                );
-              }
-            }, 850);
-          } else if (mtype === 'speechComplete') {
-            if (speech_end_finalize_timer) {
-              clearTimeout(speech_end_finalize_timer);
-              speech_end_finalize_timer = null;
-            }
-            const raw_complete = String(msg.transcript || latest_partial_transcript || '').trim();
-            if (raw_complete) {
-              reset_if_upstream_started_new_turn(raw_complete);
+            if (latest_partial_transcript.trim()) {
               enqueue_live_turn(
-                raw_complete,
+                latest_partial_transcript,
                 msg.audioProcessedMs || last_audio_ms,
-                msg.turnId,
-                true
+                msg.turnId
+              );
+            }
+          } else if (mtype === 'speechComplete') {
+            const turn_text = String(msg.transcript || latest_partial_transcript || '').trim();
+            if (turn_text) {
+              enqueue_live_turn(
+                turn_text,
+                msg.audioProcessedMs || last_audio_ms,
+                msg.turnId
               );
             }
           } else if (mtype === 'error' || msg.error || msg.message) {
@@ -20705,17 +20849,13 @@ Instructions by Action ID:
       });
 
       uws.on('close', async (close_code: number) => {
-        if (end_stream_drain_timer) {
-          clearTimeout(end_stream_drain_timer);
-          end_stream_drain_timer = null;
-        }
         console.log(
           `[AI Debug] Muse Voice upstream WebSocket closed (code ${close_code}, sessionReady: ${upstream_session_ready}, sessionId: ${session_id || 'none'}).`
         );
         if (latest_partial_transcript.trim()) {
-          enqueue_live_turn(latest_partial_transcript, last_audio_ms, undefined, true);
+          enqueue_live_turn(latest_partial_transcript, last_audio_ms);
+          await wait_for_live_turns_drained();
         }
-        await wait_for_live_turns_drained();
         send_to_client({
           type: 'closed',
           sessionId: session_id,
@@ -20786,25 +20926,8 @@ Instructions by Action ID:
           open_upstream_muse_ws();
         } else if (ctrl.type === 'endStream') {
           if (upstream_ws && upstream_ws.readyState === WebSocket.OPEN) {
-            try {
-              upstream_ws.send(JSON.stringify({ type: 'endStream' }));
-            } catch {}
+            upstream_ws.send(JSON.stringify({ type: 'endStream' }));
           }
-          // Safety drain timer when client requests endStream so any final partial speech is
-          // flushed and translated even if upstream takes too long to close
-          if (end_stream_drain_timer) clearTimeout(end_stream_drain_timer);
-          end_stream_drain_timer = setTimeout(async () => {
-            end_stream_drain_timer = null;
-            if (latest_partial_transcript.trim()) {
-              enqueue_live_turn(latest_partial_transcript, last_audio_ms, undefined, true);
-            }
-            await wait_for_live_turns_drained();
-            send_to_client({
-              type: 'closed',
-              sessionId: session_id,
-              ...get_detected_speakers_summary(),
-            });
-          }, 950);
         }
       } catch {
         // ignore invalid json
@@ -20816,14 +20939,6 @@ Instructions by Action ID:
       if (silence_finalize_timer) {
         clearTimeout(silence_finalize_timer);
         silence_finalize_timer = null;
-      }
-      if (speech_end_finalize_timer) {
-        clearTimeout(speech_end_finalize_timer);
-        speech_end_finalize_timer = null;
-      }
-      if (end_stream_drain_timer) {
-        clearTimeout(end_stream_drain_timer);
-        end_stream_drain_timer = null;
       }
       if (upstream_ws) {
         try {
