@@ -1,0 +1,1409 @@
+/* ==========================================================================
+   Lumen Board Settings Panel CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumen-settings-panel,
+.lumenSettingsPanel {
+  -lumen-settings-layer: true;
+  position: absolute;
+  top: 16px;
+  left: 64px;
+  width: 420px;
+  max-width: calc(100vw - 80px);
+  max-height: calc(100vh - 100px);
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 150;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.lumen-settings-header,
+.lumenSettingsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-settings-title,
+.lumenSettingsTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-settings-close-btn,
+.lumenSettingsCloseBtn {
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-muted, #94a3b8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 4px;
+}
+
+.lumen-settings-close-btn:hover,
+.lumenSettingsCloseBtn:hover {
+  color: var(--lumen-text-primary, #0f172a);
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+}
+
+.lumen-settings-body,
+.lumenSettingsBody {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+}
+
+.lumen-settings-field,
+.lumenSettingsField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.lumen-settings-label,
+.lumenSettingsLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--lumen-text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lumen-settings-input,
+.lumenSettingsInput {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  font-size: 13px;
+  color: var(--lumen-text-primary, #0f172a);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lumen-settings-textarea,
+.lumenSettingsTextarea {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  font-size: 12.5px;
+  color: var(--lumen-text-primary, #0f172a);
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.4;
+  outline: none;
+  background-color: var(--lumen-surface, #ffffff);
+}
+
+.lumen-settings-textarea:focus,
+.lumenSettingsTextarea:focus {
+  border-color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-section-header,
+.lumenSettingsSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lumen-settings-badge,
+.lumenSettingsBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lumen-text-secondary, #64748b);
+  background-color: var(--lumen-surface-subtle, #f1f5f9);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Color Theme Grid */
+.lumen-settings-themes-grid,
+.lumenSettingsThemesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.lumen-settings-theme-card,
+.lumenSettingsThemeCard {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background-color: var(--lumen-surface, #ffffff);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.lumen-settings-theme-card:hover,
+.lumenSettingsThemeCard:hover {
+  border-color: var(--lumen-border-strong, #cbd5e1);
+  background-color: var(--lumen-surface-hover, #f8fafc);
+}
+
+.lumen-settings-theme-card-active,
+.lumenSettingsThemeCardActive {
+  border-color: var(--lumen-accent, #2563eb) !important;
+  background-color: var(--lumen-accent-subtle, #eff6ff) !important;
+  box-shadow: 0 0 0 1px var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-theme-preview,
+.lumenSettingsThemePreview {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.lumen-settings-theme-dot,
+.lumenSettingsThemeDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.lumen-settings-theme-check,
+.lumenSettingsThemeCheck {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lumen-settings-theme-name,
+.lumenSettingsThemeName {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--lumen-text-primary, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Segmented Control */
+.lumen-settings-segmented-group,
+.lumenSettingsSegmentedGroup {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background-color: var(--lumen-surface-subtle, #f1f5f9);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.lumen-settings-segmented-btn,
+.lumenSettingsSegmentedBtn {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 5px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--lumen-text-secondary, #64748b);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  text-align: center;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-settings-segmented-btn:hover,
+.lumenSettingsSegmentedBtn:hover {
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-settings-segmented-btn-active,
+.lumenSettingsSegmentedBtnActive {
+  background-color: var(--lumen-surface, #ffffff) !important;
+  color: var(--lumen-text-primary, #0f172a) !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Card Color Swatches */
+.lumen-settings-color-swatches,
+.lumenSettingsColorSwatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.lumen-settings-color-swatch,
+.lumenSettingsColorSwatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.lumen-settings-color-swatch:hover,
+.lumenSettingsColorSwatch:hover {
+  transform: scale(1.08);
+}
+
+.lumen-settings-color-swatch-active,
+.lumenSettingsColorSwatchActive {
+  box-shadow: 0 0 0 2px var(--lumen-accent, #2563eb) !important;
+  transform: scale(1.08);
+}
+
+.lumen-settings-toggle-row,
+.lumenSettingsToggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.lumen-settings-toggle-label,
+.lumenSettingsToggleLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+/* Grid Dimension Configuration Controls */
+.lumen-settings-dimension-header,
+.lumenSettingsDimensionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lumen-settings-dimension-badge,
+.lumenSettingsDimensionBadge {
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--lumen-accent, #2563eb);
+  background-color: var(--lumen-accent-subtle, #eff6ff);
+  border: 1px solid var(--lumen-accent-border, #bfdbfe);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.lumen-settings-dimension-row,
+.lumenSettingsDimensionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lumen-settings-slider,
+.lumenSettingsSlider {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--lumen-border, #cbd5e1);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-num-input-wrap,
+.lumenSettingsNumInputWrap {
+  display: flex;
+  align-items: center;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  border-radius: 6px;
+  padding: 2px 6px;
+  width: 66px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.lumen-settings-num-input-wrap:focus-within,
+.lumenSettingsNumInputWrap:focus-within {
+  border-color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-num-input,
+.lumenSettingsNumInput {
+  width: 36px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  text-align: right;
+  padding: 2px 2px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.lumen-settings-num-input::-webkit-outer-spin-button,
+.lumen-settings-num-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.lumen-settings-num-unit,
+.lumenSettingsNumUnit {
+  font-size: 11px;
+  color: var(--lumen-text-muted, #94a3b8);
+  margin-left: 2px;
+  user-select: none;
+}
+
+.lumen-settings-presets,
+.lumenSettingsPresets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.lumen-settings-preset-btn,
+.lumenSettingsPresetBtn {
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 3px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background-color: var(--lumen-surface-subtle, #f8fafc);
+  color: var(--lumen-text-secondary, #475569);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.lumen-settings-preset-btn:hover,
+.lumenSettingsPresetBtn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+  border-color: var(--lumen-border-strong, #cbd5e1);
+}
+
+.lumen-settings-preset-btn-active,
+.lumenSettingsPresetBtnActive {
+  background-color: var(--lumen-accent, #2563eb) !important;
+  color: #ffffff !important;
+  border-color: var(--lumen-accent, #2563eb) !important;
+  font-weight: 600;
+}
+
+.lumen-settings-dimension-hint,
+.lumenSettingsDimensionHint {
+  font-size: 11px;
+  color: var(--lumen-text-muted, #94a3b8);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.lumen-settings-actions,
+.lumenSettingsActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lumen-settings-divider,
+.lumenSettingsDivider {
+  height: 1px;
+  background-color: var(--lumen-border, #e2e8f0);
+  margin: 2px 0 4px;
+}
+
+.lumen-settings-clear-btn,
+.lumenSettingsClearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fffbeb;
+  border: 1px solid #fef3c7;
+  color: #b45309;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  pointer-events: auto;
+  position: relative;
+  z-index: 5;
+}
+
+.lumen-settings-clear-btn:hover,
+.lumenSettingsClearBtn:hover {
+  background-color: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.lumen-settings-clear-btn:active,
+.lumenSettingsClearBtn:active {
+  background-color: #fde68a;
+  transform: translateY(1px);
+}
+
+.lumen-settings-delete-btn,
+.lumenSettingsDeleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  pointer-events: auto;
+  position: relative;
+  z-index: 5;
+}
+
+.lumen-settings-delete-btn:hover,
+.lumenSettingsDeleteBtn:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.lumen-settings-delete-btn:active,
+.lumenSettingsDeleteBtn:active {
+  background-color: #fecaca;
+  transform: translateY(1px);
+}
+
+.lumen-settings-modal-backdrop,
+.lumenSettingsModalBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2500;
+  padding: 16px;
+  animation: lumenSettingsFadeIn 0.15s ease-out;
+}
+
+.lumen-settings-modal-card,
+.lumenSettingsModalCard {
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.25), 0 8px 16px -6px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.lumen-settings-modal-header,
+.lumenSettingsModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-settings-modal-title-row,
+.lumenSettingsModalTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lumen-settings-modal-icon,
+.lumenSettingsModalIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lumen-settings-modal-icon-warn,
+.lumenSettingsModalIconWarn {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.lumen-settings-modal-icon-danger,
+.lumenSettingsModalIconDanger {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.lumen-settings-modal-title,
+.lumenSettingsModalTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-settings-modal-body,
+.lumenSettingsModalBody {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lumen-settings-modal-desc,
+.lumenSettingsModalDesc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--lumen-text-secondary, #475569);
+}
+
+.lumen-settings-modal-prompt,
+.lumenSettingsModalPrompt {
+  font-size: 12px;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-settings-modal-input,
+.lumenSettingsModalInput {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1.5px solid var(--lumen-border, #cbd5e1);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-primary, #0f172a);
+  font-size: 13px;
+  font-weight: 500;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lumen-settings-modal-input:focus,
+.lumenSettingsModalInput:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.lumen-settings-modal-footer,
+.lumenSettingsModalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px 14px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border-top: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-settings-delete-confirm-btn,
+.lumenSettingsDeleteConfirmBtn {
+  flex: 1;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background-color: #dc2626;
+  border: 1px solid #b91c1c;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  text-align: center;
+}
+
+.lumen-settings-delete-confirm-btn:hover:not(:disabled),
+.lumenSettingsDeleteConfirmBtn:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.lumen-settings-delete-confirm-btn-disabled,
+.lumenSettingsDeleteConfirmBtnDisabled,
+.lumen-settings-delete-confirm-btn:disabled,
+.lumenSettingsDeleteConfirmBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lumen-settings-cancel-btn,
+.lumenSettingsCancelBtn {
+  flex: 1;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  color: var(--lumen-text-secondary, #475569);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  text-align: center;
+}
+
+.lumen-settings-cancel-btn:hover,
+.lumenSettingsCancelBtn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+/* Server Sync & Storage Box */
+.lumen-settings-sync-box,
+.lumenSettingsSyncBox {
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 9px;
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lumen-settings-sync-status-row,
+.lumenSettingsSyncStatusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.lumen-settings-sync-status-left,
+.lumenSettingsSyncStatusLeft {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  flex: 1;
+}
+
+.lumen-settings-sync-dot,
+.lumenSettingsSyncDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.lumen-settings-sync-dot-active,
+.lumenSettingsSyncDotActive {
+  background-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.lumen-settings-sync-dot-syncing,
+.lumenSettingsSyncDotSyncing {
+  background-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+  animation: lumenPulse 1.2s infinite;
+}
+
+.lumen-settings-sync-dot-error,
+.lumenSettingsSyncDotError {
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+
+@keyframes lumenPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+.lumen-settings-sync-status-text,
+.lumenSettingsSyncStatusText {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-settings-sync-size-tag,
+.lumenSettingsSyncSizeTag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--lumen-accent, #2563eb);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: var(--lumen-font-mono, monospace);
+}
+
+.lumen-settings-sync-meta-list,
+.lumenSettingsSyncMetaList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 8px;
+}
+
+.lumen-settings-sync-meta-item,
+.lumenSettingsSyncMetaItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+.lumen-settings-sync-meta-item:last-child,
+.lumenSettingsSyncMetaItem:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.lumen-settings-sync-meta-label,
+.lumenSettingsSyncMetaLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lumen-text-muted, #64748b);
+}
+
+.lumen-settings-sync-meta-value,
+.lumenSettingsSyncMetaValue {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--lumen-text-primary, #0f172a);
+  text-align: left;
+  word-break: break-word;
+}
+
+.lumen-settings-force-sync-btn,
+.lumenSettingsForceSyncBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.lumen-settings-force-sync-btn:hover:not(:disabled),
+.lumenSettingsForceSyncBtn:hover:not(:disabled) {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-force-sync-btn-disabled,
+.lumenSettingsForceSyncBtnDisabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lumen-settings-view-activity-btn,
+.lumenSettingsViewActivityBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px dashed var(--lumen-border, #cbd5e1);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lumen-text-secondary, #475569);
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.lumen-settings-view-activity-btn:hover,
+.lumenSettingsViewActivityBtn:hover {
+  background-color: rgba(37, 99, 235, 0.06);
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-spin,
+.lumenSettingsSpin {
+  animation: lumenSpin 0.9s linear infinite;
+}
+
+@keyframes lumenSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lumen-settings-badge-warning,
+.lumenSettingsBadgeWarning {
+  background-color: rgba(124, 58, 237, 0.1) !important;
+  color: #7c3aed !important;
+  border-color: rgba(124, 58, 237, 0.25) !important;
+}
+
+@keyframes lumenSettingsFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .lumen-settings-panel,
+  .lumenSettingsPanel {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100vw;
+    max-height: 75vh;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    z-index: 1100;
+    animation: lumenSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes lumenSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* S3 & DigitalOcean Spaces Quota Display */
+.lumen-settings-storage-box {
+  background: var(--lumen-surface-elevated, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lumen-settings-storage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lumen-settings-storage-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-settings-badge-spaces {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.lumen-settings-storage-progress-bg {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.lumen-settings-storage-progress-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.lumen-settings-storage-progress-fill-warn {
+  background: #f59e0b;
+}
+
+.lumen-settings-storage-progress-fill-danger {
+  background: #ef4444;
+}
+
+.lumen-settings-storage-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--lumen-text-secondary, #64748b);
+}
+
+/* AI Model Selector Box in Board Settings */
+.lumen-settings-ai-box,
+.lumenSettingsAiBox {
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 9px;
+  padding: 10px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lumen-settings-ai-toolbar,
+.lumenSettingsAiToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-settings-ai-preset-wrap,
+.lumenSettingsAiPresetWrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.lumen-settings-ai-preset-label,
+.lumenSettingsAiPresetLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--lumen-text-secondary, #64748b);
+  white-space: nowrap;
+}
+
+.lumen-settings-ai-preset-select,
+.lumenSettingsAiPresetSelect {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-primary, #0f172a);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.lumen-settings-ai-reset-btn,
+.lumenSettingsAiResetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-secondary, #475569);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.14s ease;
+}
+
+.lumen-settings-ai-reset-btn:hover,
+.lumenSettingsAiResetBtn:hover {
+  border-color: #6366f1;
+  color: #4f46e5;
+  background-color: rgba(99, 102, 241, 0.06);
+}
+
+.lumen-settings-ai-list,
+.lumenSettingsAiList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lumen-settings-ai-row,
+.lumenSettingsAiRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 9px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 7px;
+}
+
+.lumen-settings-ai-task-info,
+.lumenSettingsAiTaskInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.lumen-settings-ai-task-top,
+.lumenSettingsAiTaskTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.lumen-settings-ai-task-name,
+.lumenSettingsAiTaskName {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-settings-ai-task-pill,
+.lumenSettingsAiTaskPill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.lumen-settings-ai-task-desc,
+.lumenSettingsAiTaskDesc {
+  font-size: 10.5px;
+  color: var(--lumen-text-muted, #64748b);
+  line-height: 1.3;
+}
+
+.lumen-settings-ai-select,
+.lumenSettingsAiSelect {
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  color: var(--lumen-text-primary, #0f172a);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.lumen-settings-ai-select:focus,
+.lumenSettingsAiSelect:focus {
+  border-color: #6366f1;
+}
+
+.lumen-settings-ai-catalog,
+.lumenSettingsAiCatalog {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--lumen-border, #cbd5e1);
+}
+
+.lumen-settings-ai-catalog-label,
+.lumenSettingsAiCatalogLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lumen-text-muted, #64748b);
+}
+
+.lumen-settings-ai-catalog-chips,
+.lumenSettingsAiCatalogChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.lumen-settings-ai-catalog-chip,
+.lumenSettingsAiCatalogChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  color: var(--lumen-text-secondary, #475569);
+}
+
+.lumen-settings-ai-catalog-dot,
+.lumenSettingsAiCatalogDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Board Duplicate & Configuration Export Box */
+.lumen-settings-config-box,
+.lumenSettingsConfigBox {
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 9px;
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lumen-settings-duplicate-btn,
+.lumenSettingsDuplicateBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 34px;
+  padding: 0 12px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  cursor: pointer;
+  transition: all 0.14s ease;
+  box-sizing: border-box;
+}
+
+.lumen-settings-duplicate-btn:hover:not(:disabled),
+.lumenSettingsDuplicateBtn:hover:not(:disabled) {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-duplicate-btn:disabled,
+.lumenSettingsDuplicateBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lumen-settings-config-divider,
+.lumenSettingsConfigDivider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--lumen-border, #e2e8f0);
+  margin: 1px 0;
+}
+
+.lumen-settings-config-btn-grid,
+.lumenSettingsConfigBtnGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.lumen-settings-export-btn,
+.lumenSettingsExportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 33px;
+  padding: 0 8px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--lumen-text-secondary, #475569);
+  cursor: pointer;
+  transition: all 0.14s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.lumen-settings-export-btn svg,
+.lumenSettingsExportBtn svg {
+  flex-shrink: 0;
+  color: var(--lumen-text-muted, #64748b);
+  transition: color 0.14s ease;
+}
+
+.lumen-settings-export-btn:hover,
+.lumenSettingsExportBtn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-export-btn:hover svg,
+.lumenSettingsExportBtn:hover svg {
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-export-btn-active,
+.lumenSettingsExportBtnActive {
+  background-color: rgba(37, 99, 235, 0.08);
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-export-btn-active svg,
+.lumenSettingsExportBtnActive svg {
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-paste-box,
+.lumenSettingsPasteBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.lumen-settings-paste-textarea,
+.lumenSettingsPasteTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 9px;
+  border-radius: 7px;
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-primary, #0f172a);
+  font-family: var(--lumen-font-mono, monospace);
+  font-size: 11px;
+  line-height: 1.4;
+  resize: vertical;
+  outline: none;
+}
+
+.lumen-settings-paste-textarea:focus,
+.lumenSettingsPasteTextarea:focus {
+  border-color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-settings-paste-apply-btn,
+.lumenSettingsPasteApplyBtn {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 7px;
+  border: 1px solid var(--lumen-accent, #2563eb);
+  background-color: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.lumen-settings-paste-apply-btn:hover,
+.lumenSettingsPasteApplyBtn:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.lumen-settings-config-hint,
+.lumenSettingsConfigHint {
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--lumen-text-muted, #64748b);
+}
+
+
+

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" style="background-color: var(--lumen-canvas-bg, #f4f5f7); color: var(--lumen-text-primary, #0f172a);">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lumen Notes - Visual Workspace</title>
+    <meta name="description" content="Visual canvas to organize notes, task lists, imagery, links, social media embeds, and boards on a flexible spatial grid with drag and drop, dynamic resizing, and persistent storage." />
+    <meta property="og:title" content="Lumen Notes - Visual Workspace" />
+    <meta property="og:description" content="Visual canvas to organize notes, task lists, imagery, links, social media embeds, and boards on a flexible spatial grid with drag and drop, dynamic resizing, and persistent storage." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lumen Notes" />
+    <meta property="og:image" content="/og-image.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Lumen Notes - Visual Workspace & Spatial Moodboard Studio" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lumen Notes - Visual Workspace" />
+    <meta name="twitter:description" content="Visual canvas to organize notes, task lists, imagery, links, social media embeds, and boards on a flexible spatial grid with drag and drop, dynamic resizing, and persistent storage." />
+    <meta name="twitter:image" content="/og-image.svg" />
+    <meta name="twitter:image:width" content="1200" />
+    <meta name="twitter:image:height" content="630" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script>
+      // Runtime error filtering: Vite client HMR WebSocket errors
+      (function() {
+        function isIgnorableNoise(err, msg, file) {
+          const str = (err && (err.message || err.stack)) || msg || '';
+          const filename = file || (err && err.filename) || '';
+          return (
+            str.includes('WebSocket') ||
+            str.includes('vite') ||
+            str.includes('createWebSocketModuleRunnerTransport') ||
+            filename.includes('@vite/client')
+          );
+        }
+
+        // Filter console.error and console.warn for known Vite client dev server notices
+        if (typeof console !== 'undefined' && console.error) {
+          const origConsoleError = console.error.bind(console);
+          console.error = function() {
+            const msg = Array.prototype.slice.call(arguments).map(function(a) {
+              return (typeof a === 'string' ? a : (a && a.message) || '');
+            }).join(' ');
+            if (isIgnorableNoise(null, msg, '')) {
+              return;
+            }
+            origConsoleError.apply(console, arguments);
+          };
+        }
+
+        if (typeof console !== 'undefined' && console.warn) {
+          const origConsoleWarn = console.warn.bind(console);
+          console.warn = function() {
+            const msg = Array.prototype.slice.call(arguments).map(function(a) {
+              return (typeof a === 'string' ? a : (a && a.message) || '');
+            }).join(' ');
+            if (isIgnorableNoise(null, msg, '')) {
+              return;
+            }
+            origConsoleWarn.apply(console, arguments);
+          };
+        }
+
+        window.addEventListener('unhandledrejection', function(event) {
+          if (isIgnorableNoise(event.reason, '', '')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+
+        window.addEventListener('error', function(event) {
+          if (isIgnorableNoise(event.error, event.message, event.filename)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+
+        const origOnError = window.onerror;
+        window.onerror = function(msg, url, line, col, error) {
+          if (isIgnorableNoise(error, msg, url)) {
+            return true; // suppresses the error
+          }
+          if (typeof origOnError === 'function') {
+            return origOnError.apply(this, arguments);
+          }
+          return false;
+        };
+      })();
+    </script>
+  </head>
+  <body style="background-color: var(--lumen-canvas-bg, #f4f5f7); color: var(--lumen-text-primary, #0f172a); margin: 0; padding: 0; overflow: hidden;">
+    <div id="root" style="background-color: var(--lumen-canvas-bg, #f4f5f7); width: 100%; height: 100%;"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script async defer src="https://assets.pinterest.com/js/pinit.js" data-pin-build="doBuild"></script>
+  </body>
+</html>
+

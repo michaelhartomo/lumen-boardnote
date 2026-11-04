@@ -1,0 +1,815 @@
+/* ==========================================================================
+   Lumen Canvas Card CSS Module
+   Vendor Prefix: 'lumen'
+   Interactive drawing and image collage workspace card & fullscreen studio
+   ========================================================================== */
+
+/* Card Inline Preview Container */
+.lumen-canvas-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: #ffffff;
+  overflow: hidden;
+  user-select: none;
+  border-radius: 0 0 calc(var(--lumen-card-radius, var(--lumen-radius-md, 10px)) - 1px) calc(var(--lumen-card-radius, var(--lumen-radius-md, 10px)) - 1px);
+}
+
+.lumen-canvas-card-dark {
+  background-color: #0f172a;
+}
+
+/* Inline Card Top Action Bar */
+.lumen-canvas-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  z-index: 10;
+  gap: 8px;
+}
+
+.lumen-canvas-card-dark .lumen-canvas-card-topbar {
+  background-color: rgba(15, 23, 42, 0.95);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.lumen-canvas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2563eb;
+  background-color: #eff6ff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #dbeafe;
+}
+
+.lumen-canvas-card-dark .lumen-canvas-badge {
+  color: #60a5fa;
+  background-color: rgba(37, 99, 235, 0.15);
+  border-color: rgba(96, 165, 250, 0.25);
+}
+
+.lumen-canvas-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-canvas-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #334155;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-canvas-card-btn:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+.lumen-canvas-card-btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}
+
+.lumen-canvas-card-btn-primary:hover {
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.lumen-canvas-card-dark .lumen-canvas-card-btn {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+.lumen-canvas-card-dark .lumen-canvas-card-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* Interactive Preview Surface */
+.lumen-canvas-surface-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: 20px 20px;
+}
+
+.lumen-canvas-bg-dots {
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.35) 1px, transparent 1px);
+}
+
+.lumen-canvas-bg-grid {
+  background-image: linear-gradient(to right, rgba(148, 163, 184, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+}
+
+.lumen-canvas-bg-blank {
+  background-image: none;
+}
+
+.lumen-canvas-bg-dark {
+  background-color: #090d16;
+  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.25) 1px, transparent 1px);
+}
+
+.lumen-canvas-preview-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Placed Images in Card & Fullscreen */
+.lumen-canvas-image-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lumen-canvas-placed-image {
+  position: absolute;
+  user-select: none;
+  cursor: grab;
+  box-sizing: border-box;
+  touch-action: none;
+}
+
+.lumen-canvas-placed-image-active {
+  cursor: grabbing;
+}
+
+.lumen-canvas-placed-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  display: block;
+}
+
+.lumen-canvas-placed-image-selected {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Image Selection Action Bar */
+.lumen-canvas-image-selected-toolbar {
+  position: absolute;
+  top: -42px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  z-index: 50;
+  white-space: nowrap;
+}
+
+.lumen-canvas-image-tb-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.lumen-canvas-image-tb-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.lumen-canvas-image-tb-btn-danger:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+/* Resize Handles */
+.lumen-canvas-resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #ffffff;
+  border: 2px solid #2563eb;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 30;
+}
+
+.lumen-canvas-resize-se {
+  bottom: -6px;
+  right: -6px;
+  cursor: nwse-resize;
+}
+
+.lumen-canvas-resize-sw {
+  bottom: -6px;
+  left: -6px;
+  cursor: nesw-resize;
+}
+
+.lumen-canvas-resize-ne {
+  top: -6px;
+  right: -6px;
+  cursor: nesw-resize;
+}
+
+.lumen-canvas-resize-nw {
+  top: -6px;
+  left: -6px;
+  cursor: nwse-resize;
+}
+
+/* Card Empty State Placeholder */
+.lumen-canvas-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  color: #64748b;
+  padding: 24px;
+  pointer-events: none;
+}
+
+.lumen-canvas-empty-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.lumen-canvas-card-dark .lumen-canvas-empty-title {
+  color: #94a3b8;
+}
+
+.lumen-canvas-empty-desc {
+  font-size: 11.5px;
+  color: #94a3b8;
+  max-width: 260px;
+}
+
+/* Card Hover Quick Expand Overlay */
+.lumen-canvas-card-hover-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  opacity: 0.95;
+  transition: all 0.2s ease;
+}
+
+.lumen-canvas-card:hover .lumen-canvas-card-hover-overlay {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.lumen-canvas-card-hover-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
+}
+
+.lumen-canvas-card-hover-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #60a5fa;
+}
+
+/* Scaled Canvas Preview Layer on Board Card */
+.lumen-canvas-preview-content {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: transform 0.15s ease-out;
+}
+
+/* Image count chip at bottom left of card preview */
+.lumen-canvas-card-image-chip {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #334155;
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  z-index: 15;
+  pointer-events: none;
+}
+
+.lumen-canvas-card-dark .lumen-canvas-card-image-chip {
+  color: #cbd5e1;
+  background-color: rgba(15, 23, 42, 0.92);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* ==========================================================================
+   FULLSCREEN CANVAS STUDIO MODAL
+   ========================================================================== */
+
+.lumen-canvas-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  background-color: #0b0f19;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: lumenFadeIn 0.18s ease-out;
+}
+
+@keyframes lumenFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fullscreen Studio Top Bar */
+.lumen-canvas-modal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background-color: #111827;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 40;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.lumen-canvas-modal-title-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.lumen-canvas-modal-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.lumen-canvas-title-input {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f8fafc;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 8px;
+  outline: none;
+  transition: all 0.15s ease;
+  max-width: 280px;
+}
+
+.lumen-canvas-title-input:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.lumen-canvas-title-input:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #3b82f6;
+}
+
+.lumen-canvas-stat-pill {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Fullscreen Studio Actions on Right */
+.lumen-canvas-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lumen-canvas-studio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-canvas-studio-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.lumen-canvas-studio-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lumen-canvas-studio-btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #3b82f6;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+
+.lumen-canvas-studio-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.lumen-canvas-studio-btn-danger:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.lumen-canvas-divider-vertical {
+  width: 1px;
+  height: 22px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 0 4px;
+}
+
+/* Fullscreen Workspace Center */
+.lumen-canvas-modal-workspace {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  background-color: #0b0f19;
+}
+
+/* Floating Drawing Toolbar (Top Center / Bottom Center) */
+.lumen-canvas-floating-toolbar {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(17, 24, 39, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  z-index: 50;
+}
+
+.lumen-canvas-tool-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lumen-canvas-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  position: relative;
+}
+
+.lumen-canvas-tool-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+
+.lumen-canvas-tool-btn-active {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.lumen-canvas-tool-btn-active:hover {
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+
+/* Color Palette Swatches */
+.lumen-canvas-color-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.lumen-canvas-color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+  box-sizing: border-box;
+}
+
+.lumen-canvas-color-dot:hover {
+  transform: scale(1.15);
+}
+
+.lumen-canvas-color-dot-active {
+  border-color: #ffffff;
+  transform: scale(1.2);
+  box-shadow: 0 0 0 2px #2563eb;
+}
+
+.lumen-canvas-custom-color-wrap {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.lumen-canvas-custom-color-input {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  cursor: pointer;
+  opacity: 0;
+}
+
+/* Stroke Width Controls */
+.lumen-canvas-width-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lumen-canvas-width-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-canvas-width-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.lumen-canvas-width-btn-active {
+  background-color: rgba(37, 99, 235, 0.25);
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.lumen-canvas-width-dot {
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+/* Bottom Bar: Zoom, Background style, and Tips */
+.lumen-canvas-modal-bottombar {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.lumen-canvas-bottom-left,
+.lumen-canvas-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  background-color: rgba(17, 24, 39, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.lumen-canvas-tip-text {
+  font-size: 11.5px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-canvas-tip-kbd {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: inherit;
+  color: #e2e8f0;
+}
+
+/* Modal for Image Insertion Options */
+.lumen-canvas-insert-modal {
+  position: absolute;
+  top: 60px;
+  right: 18px;
+  width: 340px;
+  background-color: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lumen-canvas-insert-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lumen-canvas-insert-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.lumen-canvas-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 20px 16px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-canvas-dropzone:hover {
+  border-color: #3b82f6;
+  background-color: rgba(37, 99, 235, 0.06);
+}
+
+.lumen-canvas-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.lumen-canvas-preset-item {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.14s ease;
+}
+
+.lumen-canvas-preset-item:hover {
+  transform: scale(1.03);
+  border-color: #3b82f6;
+}
+
+.lumen-canvas-preset-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lumen-canvas-preset-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 6px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  font-size: 10px;
+  color: #ffffff;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

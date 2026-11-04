@@ -1,0 +1,483 @@
+/* ==========================================================================
+   Lumen File Card CSS Module
+   Vendor Prefix: 'lumen'
+   All classes use kebab-case with vendor prefix
+   ========================================================================== */
+
+.lumen-file-card-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 14px;
+  position: relative;
+  box-sizing: border-box;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background-color: #ffffff;
+}
+
+/* File Header */
+.lumen-file-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.lumen-file-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.lumen-file-icon-box:hover {
+  transform: scale(1.04);
+}
+
+.lumen-file-ext-badge {
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 1px;
+  letter-spacing: 0.3px;
+}
+
+.lumen-file-meta-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lumen-file-name-input {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lumen-text-primary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-left: -4px;
+  outline: none;
+  width: 100%;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-file-name-input:hover {
+  background-color: var(--lumen-surface-elevated);
+  border-color: var(--lumen-border);
+}
+
+.lumen-file-name-input:focus {
+  background-color: var(--lumen-surface);
+  border-color: var(--lumen-accent);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.lumen-file-badges-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.lumen-file-pill {
+  font-size: 10px;
+  color: var(--lumen-text-secondary);
+  background-color: var(--lumen-surface-elevated);
+  border: 1px solid var(--lumen-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 500;
+}
+
+/* Upload & Drag-and-Drop Zone */
+.lumen-file-dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1.5px dashed var(--lumen-border-strong);
+  border-radius: var(--lumen-radius-sm);
+  background-color: var(--lumen-surface-elevated);
+  color: var(--lumen-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.lumen-file-dropzone:hover {
+  background-color: var(--lumen-accent-subtle);
+  border-color: var(--lumen-accent);
+  color: var(--lumen-accent);
+}
+
+.lumen-file-dropzone-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lumen-accent);
+}
+
+.lumen-file-dropzone-text {
+  font-size: 11.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lumen-file-dropzone-browse {
+  font-weight: 600;
+  color: var(--lumen-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* File Description Note */
+.lumen-file-description {
+  flex: 1;
+  min-height: 42px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--lumen-text-secondary);
+  background: transparent;
+  border: 1px dashed transparent;
+  border-radius: 6px;
+  padding: 4px 6px;
+  resize: none;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.lumen-file-description:hover {
+  background-color: var(--lumen-surface-elevated);
+  border-color: var(--lumen-border);
+}
+
+.lumen-file-description:focus {
+  background-color: var(--lumen-surface);
+  border-color: var(--lumen-accent);
+  border-style: solid;
+  color: var(--lumen-text-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+}
+
+.lumen-file-description::placeholder {
+  color: var(--lumen-text-tertiary);
+}
+
+/* Actions Bar */
+.lumen-file-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px solid var(--lumen-border);
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lumen-file-download-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background-color: var(--lumen-accent);
+  color: #ffffff;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-file-download-btn:hover {
+  background-color: var(--lumen-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.28);
+}
+
+.lumen-file-download-btn:active {
+  transform: translateY(0);
+}
+
+.lumen-file-size-tag {
+  opacity: 0.85;
+  font-size: 10px;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-file-sec-btn {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background-color: var(--lumen-surface-elevated);
+  border: 1px solid var(--lumen-border);
+  color: var(--lumen-text-primary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.lumen-file-sec-btn:hover {
+  background-color: var(--lumen-surface);
+  border-color: var(--lumen-border-strong);
+  transform: translateY(-1px);
+}
+
+/* Drag Over Overlay */
+.lumen-file-dropzone-active {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(37, 99, 235, 0.1);
+  border: 2px dashed var(--lumen-accent);
+  border-radius: var(--lumen-radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--lumen-accent);
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 50;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+}
+
+/* Upload Progress Overlay */
+.lumen-file-uploading-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--lumen-text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 60;
+  border-radius: var(--lumen-radius-md);
+  backdrop-filter: blur(2px);
+}
+
+/* Interactive 3D & PDF File Preview Area */
+.lumen-file-3d-preview-wrap {
+  width: 100%;
+  min-height: 160px;
+  border-radius: var(--lumen-radius-md, 8px);
+  overflow: hidden;
+  position: relative;
+  background-color: #090d16;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.25);
+  flex: 1 1 0%;
+}
+
+/* Mode Switcher Tabs for 3D & Rich File Cards */
+.lumen-file-view-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  background-color: var(--lumen-surface-elevated, #f1f5f9);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  padding: 2px;
+  border-radius: 6px;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.lumen-file-view-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--lumen-text-secondary, #64748b);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-file-view-tab:hover {
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-file-view-tab-active {
+  background-color: #ffffff;
+  color: var(--lumen-accent, #2563eb);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Empty State / Upload Info Prompt */
+.lumen-file-empty-state {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.lumen-file-upload-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 7px;
+  padding: 16px 12px;
+  border: 1.5px dashed var(--lumen-border-strong, #cbd5e1);
+  border-radius: var(--lumen-radius-md, 8px);
+  background-color: var(--lumen-surface-elevated, #f8fafc);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1 0 auto;
+  min-height: 140px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+.lumen-file-upload-prompt:hover {
+  border-color: var(--lumen-accent, #2563eb);
+  background-color: var(--lumen-accent-subtle, #eff6ff);
+}
+
+.lumen-file-upload-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--lumen-accent, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.lumen-file-upload-prompt:hover .lumen-file-upload-icon-circle {
+  transform: translateY(-2px);
+  background-color: rgba(37, 99, 235, 0.14);
+}
+
+.lumen-file-upload-prompt-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-file-upload-prompt-desc {
+  font-size: 11.5px;
+  color: var(--lumen-text-secondary, #64748b);
+}
+
+.lumen-file-upload-specs {
+  font-size: 10px;
+  color: var(--lumen-text-tertiary, #94a3b8);
+  max-width: 250px;
+  line-height: 1.35;
+}
+
+.lumen-file-upload-browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-accent, #2563eb);
+  background-color: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
+  transition: all 0.15s ease;
+  margin-top: 4px;
+}
+
+.lumen-file-upload-browse-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.35);
+}
+
+/* Seamless Card Style Overrides */
+.lumen-file-card-seamless {
+  padding: 0 !important;
+  gap: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  height: 100%;
+  width: 100%;
+}
+
+.lumen-file-card-seamless .lumen-file-3d-preview-wrap {
+  border: none !important;
+  border-radius: 0 !important;
+  height: 100%;
+  width: 100%;
+  min-height: 100%;
+}
+
+

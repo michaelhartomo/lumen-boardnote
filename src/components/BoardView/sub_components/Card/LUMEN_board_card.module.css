@@ -1,0 +1,229 @@
+/* Nested Board Item Card Styles */
+
+.lumen-board-card-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  padding: 10px 14px 14px;
+  box-sizing: border-box;
+  justify-content: space-between;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Top Meta Row */
+.lumen-board-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.lumen-board-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+
+.lumen-board-card-nest-level {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.lumen-board-card-quick-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-board-card-quick-open:hover {
+  background: #7c3aed;
+  color: #ffffff;
+  border-color: #7c3aed;
+  transform: translateX(1px);
+}
+
+/* Middle: Title & Description */
+.lumen-board-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  min-height: 0;
+}
+
+.lumen-board-card-title-input {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-left: -4px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.lumen-board-card-title-input:hover {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.lumen-board-card-title-input:focus {
+  border-color: #7c3aed;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.lumen-board-card-desc-input {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-left: -4px;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.lumen-board-card-desc-input:hover {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.lumen-board-card-desc-input:focus {
+  border-color: #7c3aed;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Live Sub-Board Preview / Stats Strip */
+.lumen-board-card-preview-strip {
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lumen-board-card-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.lumen-board-card-count {
+  font-weight: 600;
+  color: #475569;
+}
+
+.lumen-board-card-breakdown {
+  color: #64748b;
+  font-size: 10.5px;
+}
+
+/* Mini Card Blocks Representation */
+.lumen-board-card-mini-grid {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.lumen-board-card-mini-item {
+  width: 20px;
+  height: 14px;
+  border-radius: 2px;
+  background: #cbd5e1;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.lumen-board-card-mini-note {
+  background: #fef08a;
+  border-color: #facc15;
+}
+
+.lumen-board-card-mini-task {
+  background: #bbf7d0;
+  border-color: #86efac;
+}
+
+.lumen-board-card-mini-image {
+  background: #bae6fd;
+  border-color: #7dd3fc;
+}
+
+.lumen-board-card-mini-board {
+  background: #e9d5ff;
+  border-color: #d8b4fe;
+}
+
+/* Big Enter Sub-Board Action Button */
+.lumen-board-card-enter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 12px;
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  border-radius: 6px;
+  color: #6d28d9;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.18s ease;
+}
+
+.lumen-board-card-enter-btn:hover {
+  background: #7c3aed;
+  color: #ffffff;
+  border-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+  transform: translateY(-1px);
+}
+
+.lumen-board-card-hint {
+  font-size: 10px;
+  color: #94a3b8;
+  text-align: center;
+  margin-top: 4px;
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Lumen Notes - Visual Workspace",
+  "description": "Visual canvas to organize notes, task lists, imagery, links, social media embeds, and boards on a flexible spatial grid with drag and drop, dynamic resizing, and persistent storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

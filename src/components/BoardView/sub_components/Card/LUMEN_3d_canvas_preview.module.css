@@ -1,0 +1,422 @@
+/* ==========================================================================
+   Lumen Interactive 3D Character & Model Player CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumen-3d-player-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background: #0f172a;
+}
+
+.lumen-3d-player-layout-modal {
+  min-height: 540px;
+  border-radius: 0;
+  border: none;
+}
+
+.lumen-3d-container {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 185px;
+  background: radial-gradient(circle at 50% 35%, #f8fafc 0%, #e2e8f0 90%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+  box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
+.lumen-3d-container-modal {
+  min-height: 400px;
+  background: radial-gradient(circle at 50% 38%, #f8fafc 0%, #cbd5e1 92%);
+}
+
+.lumen-3d-canvas-mount {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.lumen-3d-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+}
+
+.lumen-3d-canvas:active {
+  cursor: grabbing;
+}
+
+/* Format & Character Rig Badge */
+.lumen-3d-format-pill {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.84);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Top-Right Card Micro-Toolbar */
+.lumen-3d-toolbar-card {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 3px 5px;
+  z-index: 6;
+}
+
+.lumen-3d-tool-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.lumen-3d-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.lumen-3d-tool-btn-active {
+  background: rgba(56, 189, 248, 0.28) !important;
+  color: #38bdf8 !important;
+}
+
+/* Character Skin Swatches */
+.lumen-3d-skin-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 3px;
+}
+
+.lumen-3d-skin-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.lumen-3d-skin-dot:hover {
+  transform: scale(1.18);
+}
+
+.lumen-3d-skin-dot-active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1.5px #38bdf8;
+  transform: scale(1.15);
+}
+
+/* ==========================================================================
+   Separated Animation Deck (Below the 3D Scene Viewport)
+   ========================================================================== */
+
+.lumen-3d-anim-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #0f172a;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 7px 9px;
+  flex-shrink: 0;
+  z-index: 7;
+}
+
+.lumen-3d-anim-deck-modal {
+  padding: 10px 16px;
+  gap: 8px;
+}
+
+.lumen-3d-anim-deck-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lumen-3d-anim-deck-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.lumen-3d-anim-deck-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lumen-3d-anim-play-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: rgba(37, 99, 235, 0.35);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.lumen-3d-anim-play-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* Multi-Row Wrapping Animation Grid */
+.lumen-3d-anim-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  max-height: 68px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.lumen-3d-anim-deck-modal .lumen-3d-anim-grid {
+  max-height: 110px;
+  gap: 6px;
+}
+
+.lumen-3d-anim-empty-hint {
+  font-size: 10.5px;
+  color: #94a3b8;
+  padding: 3px 4px;
+  font-style: italic;
+}
+
+.lumen-3d-anim-pill {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3.5px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.lumen-3d-anim-deck-modal .lumen-3d-anim-pill {
+  font-size: 11.5px;
+  padding: 5px 12px;
+  border-radius: 6px;
+}
+
+.lumen-3d-anim-pill:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.lumen-3d-anim-pill-custom {
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+}
+
+.lumen-3d-anim-pill-active {
+  background: #2563eb !important;
+  border-color: #60a5fa !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.45);
+}
+
+.lumen-3d-add-anim-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px dashed rgba(56, 189, 248, 0.55);
+  color: #38bdf8;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2.5px 7px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.lumen-3d-add-anim-btn:hover {
+  background: #0284c7;
+  border-style: solid;
+  color: #ffffff;
+}
+
+.lumen-3d-speed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e2e8f0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2.5px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: var(--lumen-font-mono, monospace);
+}
+
+.lumen-3d-speed-badge:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Modal Top-Right Scene Shading & Camera Toolbar */
+.lumen-3d-modal-scene-toolbar {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 5px 8px;
+  z-index: 10;
+}
+
+.lumen-3d-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.lumen-3d-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.lumen-3d-modal-btn-active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+.lumen-3d-divider-v {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.15);
+  margin: 0 2px;
+}
+
+/* Top Stats Banner in Modal */
+.lumen-3d-stats-banner {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 11.5px;
+  color: #cbd5e1;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.lumen-3d-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lumen-3d-stat-value {
+  color: #38bdf8;
+  font-weight: 700;
+  font-family: var(--lumen-font-mono, monospace);
+}
+
+/* Loading Overlay */
+.lumen-3d-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(248, 250, 252, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--lumen-text-secondary, #475569);
+  font-size: 12px;
+  z-index: 20;
+}
+
+.lumen-3d-spinner {
+  animation: lumenSpin 1s linear infinite;
+}
+
+@keyframes lumenSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

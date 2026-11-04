@@ -1,0 +1,167 @@
+/* ==========================================================================
+   Lumen Design System - Global Baseline & Variables
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+:root {
+  /* Surface & Canvas Tokens */
+  --lumen-canvas-bg: #f4f5f7;
+  --lumen-canvas-dot: #cbd5e1;
+  --lumen-canvas-grid-line: rgba(15, 23, 42, 0.05);
+  --lumen-surface: #ffffff;
+  --lumen-surface-elevated: #ffffff;
+  --lumen-surface-subtle: #f8fafc;
+  --lumen-surface-hover: #f1f5f9;
+  --lumen-surface-active: #e2e8f0;
+  
+  /* Border & Divider Tokens */
+  --lumen-border: #e2e8f0;
+  --lumen-border-strong: #cbd5e1;
+  --lumen-border-focus: #2563eb;
+  
+  /* Text & Typography Tokens */
+  --lumen-font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --lumen-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --lumen-text-primary: #0f172a;
+  --lumen-text-secondary: #475569;
+  --lumen-text-muted: #94a3b8;
+  --lumen-text-inverse: #ffffff;
+
+  /* Accent & Action Tokens */
+  --lumen-accent: #2563eb;
+  --lumen-accent-hover: #1d4ed8;
+  --lumen-accent-subtle: #eff6ff;
+  --lumen-accent-border: #bfdbfe;
+  
+  /* Module Tint Colors */
+  --lumen-color-white: #ffffff;
+  --lumen-color-yellow: #fef08a;
+  --lumen-color-peach: #fed7aa;
+  --lumen-color-green: #bbf7d0;
+  --lumen-color-blue: #bae6fd;
+  --lumen-color-purple: #e9d5ff;
+  --lumen-color-rose: #fecdd3;
+  --lumen-color-dark: #1e293b;
+
+  /* Elevation Shadows */
+  --lumen-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --lumen-shadow-sm: 0 2px 5px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --lumen-shadow-card: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+  --lumen-shadow-card-hover: 0 10px 24px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.06);
+  --lumen-shadow-card-active: 0 16px 36px -6px rgba(15, 23, 42, 0.18), 0 6px 14px -3px rgba(15, 23, 42, 0.08);
+  --lumen-shadow-overlay: 0 20px 40px -8px rgba(15, 23, 42, 0.22);
+
+  /* Radius Tokens */
+  --lumen-radius-xs: 4px;
+  --lumen-radius-sm: 6px;
+  --lumen-radius-md: 10px;
+  --lumen-radius-lg: 14px;
+  --lumen-radius-xl: 18px;
+
+  /* Spatial Grid */
+  --lumen-grid-size: 24px;
+}
+
+/* ==========================================================================
+   Lumen Dark Mode Theme Tokens
+   Activated when selecting dark theme in board settings
+   ========================================================================== */
+[data-theme="dark"],
+.dark,
+.lumen-theme-dark {
+  /* Dark Surface & Canvas Tokens */
+  --lumen-canvas-bg: #0f172a;
+  --lumen-canvas-dot: #334155;
+  --lumen-canvas-grid-line: rgba(255, 255, 255, 0.07);
+  --lumen-surface: #1e293b;
+  --lumen-surface-elevated: #283548;
+  --lumen-surface-subtle: #0f172a;
+  --lumen-surface-hover: #334155;
+  --lumen-surface-active: #475569;
+  
+  /* Dark Border & Divider Tokens */
+  --lumen-border: #334155;
+  --lumen-border-strong: #475569;
+  --lumen-border-focus: #38bdf8;
+  
+  /* Dark Text & Typography Tokens */
+  --lumen-text-primary: #f8fafc;
+  --lumen-text-secondary: #cbd5e1;
+  --lumen-text-muted: #94a3b8;
+  --lumen-text-inverse: #0f172a;
+
+  /* Dark Accent & Action Tokens */
+  --lumen-accent: #38bdf8;
+  --lumen-accent-hover: #0284c7;
+  --lumen-accent-subtle: rgba(56, 189, 248, 0.15);
+  --lumen-accent-border: rgba(56, 189, 248, 0.35);
+  
+  /* Module Tint Colors in Dark Theme */
+  --lumen-color-white: #1e293b;
+  --lumen-color-yellow: #3a2e10;
+  --lumen-color-peach: #3d2314;
+  --lumen-color-green: #113420;
+  --lumen-color-blue: #132f4c;
+  --lumen-color-purple: #2e174d;
+  --lumen-color-rose: #3c1422;
+  --lumen-color-dark: #0f172a;
+
+  /* Dark Elevation Shadows */
+  --lumen-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --lumen-shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --lumen-shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.65), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+  --lumen-shadow-card-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.75), 0 4px 10px -2px rgba(0, 0, 0, 0.6);
+  --lumen-shadow-card-active: 0 18px 40px -6px rgba(0, 0, 0, 0.85), 0 8px 16px -3px rgba(0, 0, 0, 0.7);
+  --lumen-shadow-overlay: 0 24px 48px -8px rgba(0, 0, 0, 0.9);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--lumen-canvas-bg);
+  color: var(--lumen-text-primary);
+  font-family: var(--lumen-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+
+input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}

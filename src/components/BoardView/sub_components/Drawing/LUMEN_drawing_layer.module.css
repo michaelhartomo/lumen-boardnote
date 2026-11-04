@@ -1,0 +1,38 @@
+/* SVG Layer for Rendered Drawing Strokes inside Spatial Viewport */
+
+.lumen-drawing-layer-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none !important;
+}
+
+.lumen-drawing-layer-svg {
+  position: absolute;
+  top: -50000px;
+  left: -50000px;
+  width: 100000px;
+  height: 100000px;
+  overflow: visible;
+  pointer-events: none !important;
+  z-index: 900;
+}
+
+.lumen-drawing-layer-svg * {
+  pointer-events: none !important;
+}
+
+.lumen-drawing-stroke {
+  pointer-events: none !important;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.lumen-drawing-stroke-hover-erase {
+  filter: drop-shadow(0 0 6px #ef4444);
+  stroke: #ef4444 !important;
+  opacity: 0.9 !important;
+  pointer-events: none !important;
+}
+

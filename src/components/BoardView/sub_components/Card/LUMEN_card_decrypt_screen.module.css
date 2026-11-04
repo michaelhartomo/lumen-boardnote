@@ -1,0 +1,227 @@
+/* ==========================================================================
+   Lumen Card Decrypt Screen CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumen-decrypt-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  text-align: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background: radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 75%);
+}
+
+.lumen-decrypt-icon-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c3aed;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+.lumen-decrypt-pulse-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  border: 1.5px dashed rgba(124, 58, 237, 0.4);
+  animation: lumenRotateRing 12s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes lumenRotateRing {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lumen-decrypt-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  margin-bottom: 2px;
+}
+
+.lumen-decrypt-subtitle {
+  font-size: 11px;
+  color: var(--lumen-text-muted, #64748b);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+.lumen-decrypt-hint-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--lumen-surface-subtle, rgba(0, 0, 0, 0.04));
+  border: 1px dashed var(--lumen-border, #cbd5e1);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  color: var(--lumen-text-secondary, #475569);
+  margin-bottom: 10px;
+  max-width: 90%;
+  word-break: break-word;
+}
+
+.lumen-decrypt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 240px;
+}
+
+.lumen-decrypt-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.lumen-decrypt-input {
+  width: 100%;
+  padding: 7px 30px 7px 10px;
+  font-size: 12px;
+  color: var(--lumen-text-primary, #0f172a);
+  background-color: var(--lumen-surface-elevated, #ffffff);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  border-radius: 7px;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.lumen-decrypt-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2.5px rgba(124, 58, 237, 0.2);
+}
+
+.lumen-decrypt-toggle-btn {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-muted, #94a3b8);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lumen-decrypt-toggle-btn:hover {
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-decrypt-btn {
+  width: 100%;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.lumen-decrypt-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+.lumen-decrypt-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lumen-decrypt-error {
+  font-size: 11px;
+  color: #ef4444;
+  margin-top: 4px;
+  line-height: 1.3;
+  animation: lumenShake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes lumenShake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-2px, 0, 0); }
+  40%, 60% { transform: translate3d(2px, 0, 0); }
+}
+
+.lumen-decrypt-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: lumenSpin 0.7s linear infinite;
+}
+
+@keyframes lumenSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Brute-Force Lockout Banner & Security Badges */
+.lumen-decrypt-lockout-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+:global(.dark) .lumen-decrypt-lockout-banner,
+:global([data-theme="dark"]) .lumen-decrypt-lockout-banner {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.lumen-decrypt-security-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 4px;
+}

@@ -1,0 +1,509 @@
+/* Drawing Layer Panel Popup Component */
+
+.lumen-drawing-layer-panel {
+  position: fixed;
+  bottom: 84px;
+  right: 28px;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 120px);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.18), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 1005;
+  user-select: none;
+  animation: lumen-layer-panel-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@keyframes lumen-layer-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.lumen-layer-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.lumen-layer-panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0f172a;
+}
+
+.lumen-layer-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+}
+
+.lumen-layer-panel-count-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.lumen-layer-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-layer-panel-icon-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-layer-panel-icon-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Upload Action Bar */
+.lumen-layer-panel-upload-bar {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.lumen-layer-upload-trigger-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+}
+
+.lumen-layer-upload-trigger-btn:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Scrollable Content Container */
+.lumen-layer-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 480px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Empty State */
+.lumen-layer-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 16px;
+  gap: 8px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-layer-empty-state:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.lumen-layer-empty-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #e0e7ff;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lumen-layer-empty-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.lumen-layer-empty-subtitle {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+/* Layer Item Row */
+.lumen-layer-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+  position: relative;
+  user-select: none;
+}
+
+.lumen-layer-item:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.lumen-layer-item-active {
+  border-color: #2563eb !important;
+  background: #eff6ff !important;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.lumen-layer-item-dragging {
+  opacity: 0.45;
+  border: 1.5px dashed #2563eb !important;
+  background: #eff6ff !important;
+}
+
+.lumen-layer-item-drag-over {
+  border-top: 2.5px solid #2563eb !important;
+  background: #f0f7ff !important;
+  box-shadow: 0 -2px 6px rgba(37, 99, 235, 0.2);
+}
+
+.lumen-layer-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  cursor: grab;
+  padding: 2px 0;
+  flex-shrink: 0;
+  transition: color 0.12s ease;
+}
+
+.lumen-layer-drag-handle:hover {
+  color: #2563eb;
+}
+
+.lumen-layer-drag-handle:active {
+  cursor: grabbing;
+}
+
+.lumen-layer-drag-handle-disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+/* Layer Thumbnail with PNG transparency checkerboard pattern */
+.lumen-layer-thumb-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  background-image: 
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lumen-layer-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.lumen-layer-stroke-thumb {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Layer Info */
+.lumen-layer-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lumen-layer-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lumen-layer-meta {
+  font-size: 10px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lumen-layer-tag-png {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Layer Actions in Row */
+.lumen-layer-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.lumen-layer-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-layer-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.lumen-layer-btn-muted {
+  color: #94a3b8;
+}
+
+.lumen-layer-btn-delete:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* Inspector / Manipulation Box for Selected Layer */
+.lumen-layer-inspector {
+  margin-top: 4px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lumen-inspector-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lumen-inspector-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lumen-inspector-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #334155;
+  font-weight: 500;
+}
+
+.lumen-inspector-val {
+  font-size: 11px;
+  font-weight: 600;
+  color: #2563eb;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dual input row for X/Y and W/H */
+.lumen-inspector-input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.lumen-inspector-field {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0 6px;
+  height: 28px;
+}
+
+.lumen-inspector-field-prefix {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-right: 4px;
+}
+
+.lumen-inspector-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #0f172a;
+  outline: none;
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slider Controls */
+.lumen-inspector-slider {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #cbd5e1;
+  outline: none;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+/* Quick Action Buttons Group (Rotate 90, Flip, Order) */
+.lumen-inspector-button-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lumen-inspector-btn {
+  flex: 1;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.lumen-inspector-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.lumen-inspector-btn-active {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+  font-weight: 600;
+}
+
+.lumen-inspector-danger-btn {
+  flex: 1;
+  height: 28px;
+  border-radius: 6px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-inspector-danger-btn:hover {
+  background: #ffe4e6;
+  border-color: #fda4af;
+}
+
+/* Responsive adjustments for mobile screens */
+@media (max-width: 768px) {
+  .lumen-drawing-layer-panel {
+    bottom: 110px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-height: calc(100vh - 160px);
+  }
+}

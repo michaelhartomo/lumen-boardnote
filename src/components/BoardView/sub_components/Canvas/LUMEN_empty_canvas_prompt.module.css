@@ -1,0 +1,178 @@
+/* Lumen Notes - Floating Centered Empty Canvas Prompt CSS Module */
+
+@keyframes lumenFloatMotion {
+  0%, 100% {
+    transform: translateY(0px);
+    box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+  }
+  50% {
+    transform: translateY(-8px);
+    box-shadow: 0 22px 42px -10px rgba(15, 23, 42, 0.13), 0 6px 16px -3px rgba(15, 23, 42, 0.06);
+  }
+}
+
+.lumen-empty-prompt-wrapper {
+  position: absolute;
+  width: 480px;
+  max-width: calc(100vw - 80px);
+  z-index: 15;
+  pointer-events: auto;
+  user-select: none;
+  transform: translate(-50%, -50%);
+  transition: left 0.08s ease-out, top 0.08s ease-out;
+  will-change: left, top;
+}
+
+.lumen-empty-prompt-card {
+  background: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, rgba(226, 232, 240, 0.9));
+  border-radius: 16px;
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+  padding: 28px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: lumenFloatMotion 3.6s ease-in-out infinite;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+.lumen-empty-prompt-card:hover {
+  animation-play-state: paused;
+  border-color: var(--lumen-border-strong, #cbd5e1);
+  box-shadow: 0 20px 48px -10px rgba(15, 23, 42, 0.14), 0 6px 18px -2px rgba(15, 23, 42, 0.07);
+}
+
+.lumen-empty-prompt-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--lumen-accent, #2563eb);
+  margin-bottom: 14px;
+}
+
+.lumen-empty-prompt-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  letter-spacing: -0.015em;
+  margin: 0 0 6px 0;
+}
+
+.lumen-empty-prompt-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--lumen-text-secondary, #64748b);
+  max-width: 380px;
+  margin: 0 auto 20px auto;
+}
+
+/* Quick Action Buttons Grid */
+.lumen-empty-prompt-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.lumen-empty-prompt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  border: 1px solid transparent;
+  outline: none;
+  user-select: none;
+}
+
+.lumen-empty-prompt-btn:hover {
+  transform: translateY(-1px);
+}
+
+.lumen-empty-prompt-btn:active {
+  transform: translateY(0);
+}
+
+/* Button Variants */
+.lumen-empty-prompt-btn-note {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+.lumen-empty-prompt-btn-note:hover {
+  background: #fde68a;
+  box-shadow: 0 4px 12px -2px rgba(245, 158, 11, 0.2);
+}
+
+.lumen-empty-prompt-btn-task {
+  background: #ccfbf1;
+  color: #0f766e;
+  border-color: #99f6e4;
+}
+.lumen-empty-prompt-btn-task:hover {
+  background: #99f6e4;
+  box-shadow: 0 4px 12px -2px rgba(20, 184, 166, 0.2);
+}
+
+.lumen-empty-prompt-btn-image {
+  background: #eff6ff;
+  color: #1e40af;
+  border-color: #dbeafe;
+}
+.lumen-empty-prompt-btn-image:hover {
+  background: #dbeafe;
+  box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.2);
+}
+
+.lumen-empty-prompt-btn-draw {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border-color: #e9d5ff;
+}
+.lumen-empty-prompt-btn-draw:hover {
+  background: #e9d5ff;
+  box-shadow: 0 4px 12px -2px rgba(168, 85, 247, 0.2);
+}
+
+.lumen-empty-prompt-btn-template {
+  background: var(--lumen-surface-secondary, #f8fafc);
+  color: var(--lumen-text-primary, #334155);
+  border-color: var(--lumen-border, #e2e8f0);
+}
+.lumen-empty-prompt-btn-template:hover {
+  background: #ffffff;
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+}
+
+/* Subtle Footer Guidance Note */
+.lumen-empty-prompt-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--lumen-text-muted, #94a3b8);
+}
+
+.lumen-empty-prompt-hint-kbd {
+  font-family: var(--lumen-font-mono, monospace);
+  font-size: 10px;
+  padding: 1px 5px;
+  background: var(--lumen-surface-secondary, #f1f5f9);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 4px;
+  color: var(--lumen-text-secondary, #64748b);
+}

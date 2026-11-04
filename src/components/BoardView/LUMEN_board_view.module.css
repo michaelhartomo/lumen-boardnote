@@ -1,0 +1,255 @@
+/* ==========================================================================
+   Lumen Board View CSS Module
+   Vendor Prefix: 'lumen'
+   Kebab-case class definitions with vendor prefix
+   ========================================================================== */
+
+.lumen-board-view,
+.lumenBoardView {
+  -lumen-layout: full-viewport;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--lumen-canvas-bg, #f4f5f7);
+  color: var(--lumen-text-primary, #0f172a);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.lumen-board-workspace,
+.lumenBoardWorkspace {
+  -lumen-workspace-body: canvas-and-dock;
+  flex: 1;
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 48px);
+  height: calc(100dvh - 48px);
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.lumen-board-workspace-no-header,
+.lumenBoardWorkspaceNoHeader {
+  -lumen-workspace-body: full-canvas-and-dock;
+  flex: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.lumen-board-view-loader,
+.lumenBoardViewLoader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(244, 245, 247, 0.95);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  color: var(--lumen-text-primary, #0f172a);
+  font-size: 13px;
+}
+
+.lumen-board-spinner,
+.lumenBoardSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(59, 130, 246, 0.2);
+  border-top-color: var(--lumen-accent, #3b82f6);
+  border-radius: 50%;
+  animation: lumen-spin 0.8s linear infinite;
+}
+
+@keyframes lumen-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Card Property Button on Right Side */
+.lumen-right-property-toggle-btn,
+.lumenRightPropertyToggleBtn {
+  position: absolute;
+  top: 18px;
+  right: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  border-radius: 24px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  color: var(--lumen-text-primary, #0f172a);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+}
+
+.lumen-right-property-toggle-btn:hover,
+.lumenRightPropertyToggleBtn:hover {
+  background-color: #ffffff;
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.18);
+}
+
+.lumen-right-property-label,
+.lumenRightPropertyLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.lumen-right-property-badge,
+.lumenRightPropertyBadge {
+  background-color: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 1px 6px;
+  min-width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .lumen-right-property-toggle-btn,
+  .lumenRightPropertyToggleBtn {
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    left: auto !important;
+    padding: 7px 12px;
+    font-size: 11.5px;
+    border-radius: 20px;
+    z-index: 60;
+  }
+}
+
+/* Access Denied (Private Board) Screen */
+.lumen-access-denied-screen,
+.lumenAccessDeniedScreen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  box-sizing: border-box;
+}
+
+.lumen-access-denied-card,
+.lumenAccessDeniedCard {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 16px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.08);
+}
+
+.lumen-access-denied-icon,
+.lumenAccessDeniedIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.lumen-access-denied-title,
+.lumenAccessDeniedTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  margin: 0;
+}
+
+.lumen-access-denied-desc,
+.lumenAccessDeniedDesc {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--lumen-text-secondary, #64748b);
+  margin: 0;
+}
+
+.lumen-access-denied-actions,
+.lumenAccessDeniedActions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lumen-access-denied-btn,
+.lumenAccessDeniedBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background-color: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.lumen-access-denied-btn:hover,
+.lumenAccessDeniedBtn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Shared Role Floating Banner */
+.lumen-shared-role-banner,
+.lumenSharedRoleBanner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background-color: rgba(15, 23, 42, 0.86);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+  pointer-events: none;
+}

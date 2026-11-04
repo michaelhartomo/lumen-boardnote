@@ -1,0 +1,231 @@
+/* ==========================================================================
+   Lumen Template Modal CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumen-modal-backdrop,
+.lumenModalBackdrop {
+  -lumen-modal-layer: true;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.lumen-modal-window,
+.lumenModalWindow {
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 12px;
+  width: 600px;
+  max-width: 95vw;
+  max-height: 85vh;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lumen-modal-header,
+.lumenModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-modal-title,
+.lumenModalTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-modal-close-btn,
+.lumenModalCloseBtn {
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-muted, #94a3b8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.lumen-modal-close-btn:hover,
+.lumenModalCloseBtn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-template-grid,
+.lumenTemplateGrid {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.lumen-template-card,
+.lumenTemplateCard {
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 8px;
+  padding: 14px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.lumen-template-card:hover,
+.lumenTemplateCard:hover {
+  border-color: var(--lumen-accent, #2563eb);
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+  transform: translateY(-1px);
+}
+
+.lumen-template-name,
+.lumenTemplateName {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-template-desc,
+.lumenTemplateDesc {
+  font-size: 12px;
+  color: var(--lumen-text-secondary, #64748b);
+  line-height: 1.4;
+}
+
+.lumen-template-badge,
+.lumenTemplateBadge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  align-self: flex-start;
+  font-weight: 600;
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.lumen-template-badge-row,
+.lumenTemplateBadgeRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.lumen-template-meta-badge,
+.lumenTemplateMetaBadge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  color: var(--lumen-text-secondary, #64748b);
+}
+
+.lumen-template-import-bar,
+.lumenTemplateImportBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+  flex-wrap: wrap;
+}
+
+.lumen-template-import-info,
+.lumenTemplateImportInfo {
+  font-size: 11.5px;
+  color: var(--lumen-text-secondary, #64748b);
+}
+
+.lumen-template-import-actions,
+.lumenTemplateImportActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-template-import-btn,
+.lumenTemplateImportBtn,
+.lumen-template-paste-btn,
+.lumenTemplatePasteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-primary, #0f172a);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.lumen-template-import-btn:hover,
+.lumenTemplateImportBtn:hover,
+.lumen-template-paste-btn:hover,
+.lumenTemplatePasteBtn:hover {
+  border-color: var(--lumen-accent, #2563eb);
+  color: var(--lumen-accent, #2563eb);
+}
+
+.lumen-template-paste-panel,
+.lumenTemplatePastePanel {
+  padding: 10px 16px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lumen-template-paste-textarea,
+.lumenTemplatePasteTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  font-family: var(--lumen-font-mono, monospace);
+  font-size: 11px;
+  resize: vertical;
+  outline: none;
+}
+
+.lumen-template-paste-submit,
+.lumenTemplatePasteSubmit {
+  align-self: flex-end;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-accent, #2563eb);
+  background-color: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+

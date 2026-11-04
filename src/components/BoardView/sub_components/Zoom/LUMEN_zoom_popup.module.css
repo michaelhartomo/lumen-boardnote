@@ -1,0 +1,263 @@
+/* LUMEN Zoom Popup Styles */
+.lumen-zoom-popup-portal {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2100;
+}
+
+.lumen-zoom-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: transparent;
+  pointer-events: auto;
+  z-index: 2100;
+}
+
+.lumen-zoom-popup-card {
+  position: fixed;
+  pointer-events: auto;
+  z-index: 2101;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 14px 34px -4px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(15, 23, 42, 0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: lumenZoomPopupFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--lumen-font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+@keyframes lumenZoomPopupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header with Title and Current Zoom Percentage */
+.lumen-zoom-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lumen-zoom-popup-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lumen-zoom-popup-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.lumen-zoom-popup-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background-color: var(--lumen-canvas-bg, #f1f5f9);
+  color: var(--lumen-accent, #6366f1);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--lumen-font-mono, monospace);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-zoom-popup-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--lumen-text-tertiary, #94a3b8);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-zoom-popup-close-btn:hover {
+  background-color: var(--lumen-canvas-bg, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+/* Slider Section with Step Buttons and Slider Track */
+.lumen-zoom-popup-slider-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lumen-zoom-popup-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lumen-zoom-popup-step-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-zoom-popup-step-btn:hover:not(:disabled) {
+  background-color: var(--lumen-canvas-bg, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+  border-color: #cbd5e1;
+}
+
+.lumen-zoom-popup-step-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Custom Styled Range Slider */
+.lumen-zoom-popup-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--lumen-accent, #6366f1) 0%,
+    var(--lumen-accent, #6366f1) var(--lumen-slider-fill, 40%),
+    var(--lumen-border, #e2e8f0) var(--lumen-slider-fill, 40%),
+    var(--lumen-border, #e2e8f0) 100%
+  );
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.08s ease;
+}
+
+.lumen-zoom-popup-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid var(--lumen-accent, #6366f1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.lumen-zoom-popup-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+.lumen-zoom-popup-slider::-webkit-slider-thumb:active {
+  transform: scale(1.22);
+}
+
+.lumen-zoom-popup-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid var(--lumen-accent, #6366f1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+/* Min / Mid / Max Scale Labels */
+.lumen-zoom-popup-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--lumen-text-tertiary, #94a3b8);
+  padding: 0 34px;
+}
+
+/* Quick Zoom Presets Row */
+.lumen-zoom-popup-presets {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 4px 0;
+  border-top: 1px solid var(--lumen-border, #f1f5f9);
+}
+
+.lumen-zoom-popup-preset-btn {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  color: var(--lumen-text-secondary, #64748b);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s ease;
+}
+
+.lumen-zoom-popup-preset-btn:hover {
+  background-color: #e2e8f0;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-zoom-popup-preset-btn-active {
+  background-color: rgba(99, 102, 241, 0.12);
+  color: var(--lumen-accent, #6366f1);
+  border-color: rgba(99, 102, 241, 0.3);
+  font-weight: 700;
+}
+
+/* Reset Zoom Action Button */
+.lumen-zoom-popup-reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-primary, #0f172a);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-zoom-popup-reset-btn:hover {
+  background-color: var(--lumen-canvas-bg, #f1f5f9);
+  border-color: var(--lumen-accent, #6366f1);
+  color: var(--lumen-accent, #6366f1);
+}
+
+.lumen-zoom-popup-reset-btn:active {
+  transform: translateY(1px);
+}

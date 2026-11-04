@@ -1,0 +1,239 @@
+/* LUMEN Pinterest Pin Widget Styles (Size L, 100% Width) */
+.lumen-pinterest-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Toolbar Bar */
+.lumen-pinterest-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+  gap: 8px;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.lumen-pinterest-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-pinterest-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background-color: #fef2f2;
+  color: #e60023;
+  border: 1px solid #fee2e2;
+  line-height: 1.2;
+}
+
+/* Pinterest Embed Widget Area */
+.lumen-pinterest-widget-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #fafafa;
+  min-height: 220px;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Official DOM Slot managed by pinit.js — 100% Width */
+.lumen-pinterest-slot {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.lumen-pinterest-slot > * {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+
+/* Ensure Pinterest widget spans, iframes and cards fill 100% width */
+.lumen-pinterest-slot span[data-pin-log],
+.lumen-pinterest-slot span.embed_pin,
+.lumen-pinterest-slot span[class*="embed_pin"],
+.lumen-pinterest-slot span[class*="PIN_"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
+}
+
+.lumen-pinterest-slot iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+  border: none !important;
+  border-radius: 12px !important;
+}
+
+.lumen-pinterest-slot img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: cover !important;
+}
+
+/* Hide description text inside Pinterest widget */
+.lumen-pinterest-slot [class*="deets"] [class*="title"],
+.lumen-pinterest-slot .deets .title,
+.lumen-pinterest-slot .pin_title,
+.lumen-pinterest-slot [class*="pin_title"],
+.lumen-pinterest-slot [class*="description"],
+.lumen-pinterest-slot span[data-pin-description] {
+  display: none !important;
+}
+
+/* Hide Pinterest hover Save / Repin button popup on widget content */
+.lumen-pinterest-slot > span:nth-of-type(1) > span:nth-of-type(1) > span:nth-of-type(2),
+.lumen-pinterest-slot [data-pin-log*="repin"],
+.lumen-pinterest-slot [class*="repin"],
+.lumen-pinterest-slot [data-pin-href*="pin/create"],
+.lumen-pinterest-slot a[href*="pinterest.com/pin/create"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Fallback & Enhanced Rich Card View (100% Width, Description Removed) */
+.lumen-pinterest-rich-pin {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  background-color: #ffffff;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.lumen-pinterest-rich-image-wrap {
+  position: relative;
+  width: 100%;
+  background-color: #f1f5f9;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lumen-pinterest-rich-img {
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
+  display: block;
+}
+
+.lumen-pinterest-hover-save-btn {
+  display: none !important;
+}
+
+.lumen-pinterest-rich-details {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #ffffff;
+}
+
+.lumen-pinterest-rich-author-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lumen-pinterest-author-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-pinterest-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  object-fit: cover;
+  background-color: #cbd5e1;
+}
+
+.lumen-pinterest-author-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-pinterest-board-badge {
+  font-size: 10px;
+  color: var(--lumen-text-muted, #94a3b8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+/* Footer Link CTA */
+.lumen-pinterest-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background-color: #ffffff;
+  border-top: 1px solid var(--lumen-border, #e2e8f0);
+  flex-shrink: 0;
+}
+
+.lumen-pinterest-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e60023;
+  text-decoration: none;
+  transition: opacity 0.12s ease;
+}
+
+.lumen-pinterest-open-btn:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}

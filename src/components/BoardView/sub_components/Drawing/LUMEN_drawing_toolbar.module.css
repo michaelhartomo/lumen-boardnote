@@ -1,0 +1,578 @@
+/* Drawing Toolbar matching screenshot exactly */
+
+.lumen-drawing-toolbar-wrapper {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.16), 0 2px 8px -1px rgba(15, 23, 42, 0.08);
+  user-select: none;
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+  white-space: nowrap;
+  animation: lumen-toolbar-appear 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lumen-drawing-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.lumen-drawing-control-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@keyframes lumen-toolbar-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* Tool Buttons: Pen, Pointer, Eraser */
+.lumen-drawing-tool-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.lumen-drawing-tool-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Active Boxed Tool Button (matches Pen in user screenshot) */
+.lumen-drawing-tool-btn-active {
+  border-color: #1e293b !important;
+  color: #0f172a !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dividers */
+.lumen-drawing-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #e2e8f0;
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+/* Color Swatch Button */
+.lumen-drawing-color-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.lumen-drawing-color-box:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Stroke Width Squiggle Button */
+.lumen-drawing-squiggle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-drawing-squiggle-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.lumen-drawing-squiggle-active {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Undo / Redo Buttons */
+.lumen-drawing-history-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-drawing-history-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.lumen-drawing-history-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Action Buttons: Cancel and Save */
+.lumen-drawing-cancel-btn {
+  padding: 5px 13px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-drawing-cancel-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.lumen-drawing-save-btn {
+  padding: 5px 15px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.lumen-drawing-save-btn-active {
+  background: #1e293b;
+  color: #ffffff;
+  border-color: #1e293b;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+.lumen-drawing-save-btn-active:hover {
+  background: #0f172a;
+  transform: translateY(-1px);
+}
+
+.lumen-drawing-save-btn-subtle {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: transparent;
+  cursor: default;
+}
+
+/* Popover for Color Picker */
+.lumen-drawing-popover {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 1001;
+  white-space: nowrap;
+  animation: lumen-popover-in 0.12s ease-out;
+}
+
+@keyframes lumen-popover-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.lumen-drawing-color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lumen-drawing-color-option:hover {
+  transform: scale(1.15);
+}
+
+.lumen-drawing-color-option-active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1e293b;
+  transform: scale(1.1);
+}
+
+/* Popover for Stroke Width */
+.lumen-drawing-width-popover {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+  z-index: 1001;
+}
+
+.lumen-drawing-width-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: #334155;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  text-align: left;
+}
+
+.lumen-drawing-width-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.lumen-drawing-width-item-active {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.lumen-drawing-width-preview-line {
+  height: 4px;
+  border-radius: 2px;
+  background: #1e293b;
+  flex: 1;
+}
+
+/* All Touch / Stylus Toggle Button */
+.lumen-drawing-palm-btn {
+  height: 32px;
+  padding: 0 10px;
+  gap: 5px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.lumen-drawing-palm-btn-label {
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.lumen-drawing-palm-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* Stylus Mode (No resting palm detected -> no glow) */
+.lumen-drawing-palm-stylus {
+  background: #ffffff !important;
+  border-color: #1e293b !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.lumen-drawing-palm-stylus:hover {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Stylus Mode + Resting Palm Detected on Canvas -> GLOW */
+.lumen-drawing-palm-active {
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: #10b981 !important;
+  color: #059669 !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.55), 0 0 18px rgba(16, 185, 129, 0.25), inset 0 0 6px rgba(16, 185, 129, 0.18) !important;
+}
+
+.lumen-drawing-palm-active:hover {
+  background: rgba(16, 185, 129, 0.22) !important;
+  color: #047857 !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.7), 0 0 22px rgba(16, 185, 129, 0.35), inset 0 0 8px rgba(16, 185, 129, 0.25) !important;
+}
+
+.lumen-drawing-palm-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 1.5px #ffffff;
+}
+
+.lumen-drawing-palm-popover {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.16), 0 2px 8px -2px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 1002;
+  animation: lumen-toolbar-appear 0.15s ease-out;
+}
+
+.lumen-drawing-palm-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 6px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.lumen-drawing-stylus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 1px 6px;
+  border-radius: 10px;
+  text-transform: none;
+}
+
+.lumen-drawing-stylus-beacon {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.lumen-drawing-palm-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+
+.lumen-drawing-palm-item:hover {
+  background: #f8fafc;
+}
+
+.lumen-drawing-palm-item-active {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.lumen-drawing-palm-item-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.lumen-drawing-palm-item-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-drawing-palm-item-desc {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.35;
+  padding-left: 20px;
+}
+
+.lumen-drawing-divider-desktop {
+  width: 1px;
+  height: 20px;
+  background-color: #e2e8f0;
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+/* Responsive Mobile Layout (2-Line Layout at Bottom where Dock was) */
+@media (max-width: 768px) {
+  .lumen-drawing-toolbar-wrapper {
+    bottom: 14px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    max-width: calc(100vw - 16px);
+    margin: 0;
+    white-space: nowrap;
+    flex-direction: column;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .lumen-drawing-toolbar-group {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+  }
+
+  .lumen-drawing-divider-desktop {
+    display: none;
+  }
+
+  .lumen-drawing-divider {
+    height: 18px;
+    margin: 0 2px;
+  }
+
+  .lumen-drawing-tool-btn,
+  .lumen-drawing-squiggle-btn,
+  .lumen-drawing-history-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .lumen-drawing-palm-btn {
+    height: 32px;
+    padding: 0 8px;
+    font-size: 11.5px;
+  }
+
+  .lumen-drawing-color-box {
+    width: 22px;
+    height: 22px;
+  }
+
+  .lumen-drawing-cancel-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .lumen-drawing-save-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+  }
+
+  .lumen-drawing-popover {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 32px);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .lumen-drawing-width-popover {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.lumen-drawing-layer-btn {
+  position: relative;
+}
+
+.lumen-drawing-layer-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 8px;
+  min-width: 13px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}

@@ -1,0 +1,478 @@
+/* ==========================================================================
+   Lumen Layer Panel CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumen-layer-panel,
+.lumenLayerPanel {
+  -lumen-panel-layer: true;
+  position: absolute;
+  top: 16px;
+  left: 64px;
+  width: 290px;
+  max-height: calc(100vh - 100px);
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 150;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.lumen-layer-header,
+.lumenLayerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-layer-title,
+.lumenLayerTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-layer-close-btn,
+.lumenLayerCloseBtn {
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-muted, #94a3b8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 4px;
+}
+
+.lumen-layer-close-btn:hover,
+.lumenLayerCloseBtn:hover {
+  color: var(--lumen-text-primary, #0f172a);
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+}
+
+.lumen-layer-search-box,
+.lumenLayerSearchBox {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-layer-search-input,
+.lumenLayerSearchInput {
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  font-size: 12px;
+  color: var(--lumen-text-primary, #0f172a);
+  box-sizing: border-box;
+}
+
+.lumen-layer-list,
+.lumenLayerList {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lumen-layer-item,
+.lumenLayerItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: element;
+  user-drag: element;
+  transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+
+.lumen-layer-item:active,
+.lumenLayerItem:active {
+  cursor: grabbing;
+}
+
+.lumen-layer-item:hover,
+.lumenLayerItem:hover {
+  background-color: var(--lumen-surface-hover, #f8fafc);
+  border-color: #cbd5e1;
+}
+
+.lumen-layer-item-active,
+.lumenLayerItemActive {
+  background-color: rgba(37, 99, 235, 0.05);
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.08);
+}
+
+/* Dragging state for item being moved */
+.lumen-layer-item-dragging,
+.lumenLayerItemDragging {
+  opacity: 0.35 !important;
+  background-color: #f8fafc !important;
+  border: 1px dashed var(--lumen-accent, #3b82f6) !important;
+  transform: scale(0.98);
+}
+
+/* Visual Insertion Indicator: Top line */
+.lumen-layer-drop-line-top,
+.lumenLayerDropLineTop {
+  position: absolute;
+  top: -3px;
+  left: 2px;
+  right: 2px;
+  height: 3px;
+  background-color: var(--lumen-accent, #2563eb);
+  border-radius: 2px;
+  z-index: 20;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.65);
+}
+
+.lumen-layer-drop-line-top::before,
+.lumenLayerDropLineTop::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: -2.5px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--lumen-accent, #2563eb);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(37, 99, 235, 0.8);
+}
+
+/* Visual Insertion Indicator: Bottom line */
+.lumen-layer-drop-line-bottom,
+.lumenLayerDropLineBottom {
+  position: absolute;
+  bottom: -3px;
+  left: 2px;
+  right: 2px;
+  height: 3px;
+  background-color: var(--lumen-accent, #2563eb);
+  border-radius: 2px;
+  z-index: 20;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.65);
+}
+
+.lumen-layer-drop-line-bottom::before,
+.lumenLayerDropLineBottom::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: -2.5px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--lumen-accent, #2563eb);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(37, 99, 235, 0.8);
+}
+
+/* Line 1: Header row with handle, icon, title, type badge */
+.lumen-layer-item-top,
+.lumenLayerItemTop {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+}
+
+/* Drag Handle */
+.lumen-layer-drag-handle,
+.lumenLayerDragHandle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lumen-text-muted, #94a3b8);
+  cursor: grab;
+  padding: 3px 2px;
+  border-radius: 4px;
+  transition: color 0.12s ease, background-color 0.12s ease;
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.lumen-layer-drag-handle:hover,
+.lumenLayerDragHandle:hover {
+  color: var(--lumen-text-primary, #0f172a);
+  background-color: #f1f5f9;
+}
+
+.lumen-layer-drag-handle:active,
+.lumenLayerDragHandle:active {
+  cursor: grabbing;
+}
+
+.lumen-layer-icon,
+.lumenLayerIcon {
+  color: var(--lumen-text-secondary, #64748b);
+  flex-shrink: 0;
+}
+
+.lumen-layer-item-title,
+.lumenLayerItemTitle {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lumen-layer-item-badge,
+.lumenLayerItemBadge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--lumen-text-secondary, #64748b);
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  padding: 1px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Line 2: Actions button toolbar row with plenty of room and clean button styling */
+.lumen-layer-actions,
+.lumenLayerActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  padding-top: 5px;
+  border-top: 1px solid var(--lumen-border, #f1f5f9);
+}
+
+.lumen-layer-actions-group,
+.lumenLayerActionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lumen-layer-action-btn,
+.lumenLayerActionBtn {
+  background: var(--lumen-surface-hover, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  color: var(--lumen-text-secondary, #64748b);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.12s ease;
+  line-height: 1;
+}
+
+.lumen-layer-action-btn:hover,
+.lumenLayerActionBtn:hover {
+  color: var(--lumen-text-primary, #0f172a);
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.lumen-layer-action-btn-active,
+.lumenLayerActionBtnActive {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #d97706;
+}
+
+.lumen-layer-action-delete:hover,
+.lumenLayerActionDelete:hover {
+  color: #ef4444 !important;
+  background-color: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .lumen-layer-panel,
+  .lumenLayerPanel {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100vw;
+    max-height: 75vh;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    z-index: 1100;
+    animation: lumenSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes lumenSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.lumen-layer-header-actions,
+.lumenLayerHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-layer-add-sticker-btn,
+.lumenLayerAddStickerBtn {
+  background: var(--lumen-surface-hover, #f1f5f9);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s ease;
+  line-height: 1;
+}
+
+.lumen-layer-add-sticker-btn:hover,
+.lumenLayerAddStickerBtn:hover {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #6d28d9;
+}
+
+.lumen-layer-thumbnail,
+.lumenLayerThumbnail {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  flex-shrink: 0;
+}
+
+.lumen-layer-badge-sticker,
+.lumenLayerBadgeSticker {
+  background-color: rgba(147, 51, 234, 0.1) !important;
+  color: #7e22ce !important;
+  border-color: rgba(147, 51, 234, 0.25) !important;
+}
+
+.lumen-layer-time-filter-bar,
+.lumenLayerTimeFilterBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+  background: #f8fafc;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lumen-layer-time-filter-bar::-webkit-scrollbar,
+.lumenLayerTimeFilterBar::-webkit-scrollbar {
+  display: none;
+}
+
+.lumen-layer-time-filter-chip,
+.lumenLayerTimeFilterChip {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 5px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background: #ffffff;
+  color: var(--lumen-text-secondary, #64748b);
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s ease;
+}
+
+.lumen-layer-time-filter-chip:hover,
+.lumenLayerTimeFilterChip:hover {
+  border-color: #cbd5e1;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-layer-time-filter-chip-active,
+.lumenLayerTimeFilterChipActive {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.lumen-layer-item-time-row,
+.lumenLayerItemTimeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #334155;
+}
+
+.lumen-layer-item-time-text,
+.lumenLayerItemTimeText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.lumen-layer-item-gcal-tag,
+.lumenLayerItemGcalTag {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #1d4ed8;
+  background: #dbeafe;
+  padding: 1px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+

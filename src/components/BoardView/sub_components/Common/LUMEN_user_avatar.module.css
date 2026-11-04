@@ -1,0 +1,81 @@
+.lumen-avatar-container,
+.lumenAvatarContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.lumen-avatar-circle,
+.lumenAvatarCircle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.lumen-avatar-image,
+.lumenAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.lumen-avatar-fallback,
+.lumenAvatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.lumen-avatar-guest,
+.lumenAvatarGuest {
+  background-color: #64748b !important;
+  color: #f8fafc !important;
+}
+
+.lumen-status-indicator,
+.lumenStatusIndicator {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--lumen-surface, #ffffff);
+}
+
+.lumen-status-active,
+.lumenStatusActive {
+  background-color: #22c55e;
+  box-shadow: 0 0 4px #22c55e;
+}
+
+.lumen-status-inactive,
+.lumenStatusInactive {
+  background-color: #94a3b8;
+}
+
+.lumen-status-pending,
+.lumenStatusPending {
+  background-color: #f59e0b;
+}
+
+.lumen-status-guest,
+.lumenStatusGuest {
+  background-color: #94a3b8;
+}

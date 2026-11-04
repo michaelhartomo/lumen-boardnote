@@ -1,0 +1,952 @@
+/* Geo Map Location Card Styles */
+.lumen-geo-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: var(--lumen-radius-sm);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  position: relative;
+  font-family: inherit;
+  user-select: none;
+}
+
+/* Header Info */
+.lumen-geo-header {
+  padding: 8px 10px;
+  background-color: var(--lumen-surface-elevated);
+  border-bottom: 1px solid var(--lumen-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lumen-geo-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.lumen-geo-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--lumen-radius-xs);
+  background-color: #eff6ff;
+  color: var(--lumen-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #bfdbfe;
+}
+
+.lumen-geo-icon-wrap-multi {
+  background-color: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+
+.lumen-geo-titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lumen-geo-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lumen-geo-place-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--lumen-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+
+.lumen-geo-stop-count-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 700;
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.lumen-geo-address {
+  font-size: 10.5px;
+  color: var(--lumen-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+  margin-top: 1px;
+}
+
+.lumen-geo-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.lumen-geo-view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  background-color: var(--lumen-surface);
+  border: 1px solid var(--lumen-border);
+  border-radius: var(--lumen-radius-xs);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--lumen-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.lumen-geo-view-toggle-btn:hover {
+  background-color: var(--lumen-surface-subtle);
+  border-color: var(--lumen-border-strong);
+  color: var(--lumen-text-primary);
+}
+
+.lumen-geo-view-toggle-active {
+  background-color: var(--lumen-accent-subtle) !important;
+  border-color: var(--lumen-accent) !important;
+  color: var(--lumen-accent) !important;
+}
+
+.lumen-geo-coords-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  background-color: var(--lumen-surface);
+  border: 1px solid var(--lumen-border);
+  border-radius: var(--lumen-radius-xs);
+  font-size: 9.5px;
+  font-family: var(--lumen-font-mono, monospace);
+  color: var(--lumen-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.lumen-geo-coords-badge:hover {
+  background-color: var(--lumen-accent-subtle);
+  color: var(--lumen-accent);
+  border-color: var(--lumen-accent);
+}
+
+/* Map Frame & Viewer */
+.lumen-geo-map-frame {
+  position: relative;
+  flex: 1 0 auto;
+  min-height: 120px;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+.lumen-geo-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Interactive Lock / Unlock overlay to prevent accidental pan during card drag */
+.lumen-geo-map-lock-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: transparent;
+  z-index: 5;
+  cursor: grab;
+}
+
+.lumen-geo-map-lock-overlay-disabled {
+  pointer-events: none;
+}
+
+.lumen-geo-map-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+
+.lumen-geo-ctrl-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--lumen-radius-xs);
+  background-color: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--lumen-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  color: var(--lumen-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.12s ease;
+  font-size: 11px;
+}
+
+.lumen-geo-ctrl-btn:hover {
+  background-color: #ffffff;
+  border-color: var(--lumen-accent);
+  color: var(--lumen-accent);
+  transform: scale(1.05);
+}
+
+.lumen-geo-ctrl-btn-active {
+  background-color: var(--lumen-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--lumen-accent) !important;
+}
+
+/* Multi-Destination Route Ribbon inside Map View */
+.lumen-geo-route-ribbon {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  right: 6px;
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--lumen-border-strong);
+  border-radius: var(--lumen-radius-sm);
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.lumen-geo-ribbon-stops {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  min-width: 0;
+  flex: 1;
+  scrollbar-width: none;
+}
+
+.lumen-geo-ribbon-stops::-webkit-scrollbar {
+  display: none;
+}
+
+.lumen-geo-ribbon-chip-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.lumen-geo-ribbon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 9.5px;
+  border: 1px solid var(--lumen-border);
+  line-height: 1.1;
+  max-width: 90px;
+}
+
+.lumen-geo-chip-origin {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.lumen-geo-chip-mid {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.lumen-geo-chip-dest {
+  background-color: #fff1f2;
+  color: #be123c;
+  border-color: #fecdd3;
+}
+
+.lumen-geo-ribbon-letter {
+  font-weight: 800;
+  font-size: 9px;
+}
+
+.lumen-geo-ribbon-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.lumen-geo-ribbon-arrow {
+  color: var(--lumen-text-muted);
+  font-size: 10px;
+}
+
+.lumen-geo-ribbon-modes {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.lumen-geo-ribbon-mode-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  line-height: 1;
+}
+
+.lumen-geo-ribbon-mode-btn:hover {
+  background-color: var(--lumen-surface-hover);
+}
+
+.lumen-geo-ribbon-mode-active {
+  background-color: var(--lumen-accent-subtle) !important;
+  border-color: var(--lumen-accent-border) !important;
+}
+
+/* Itinerary Stops View Frame */
+.lumen-geo-itinerary-frame {
+  flex: 1;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--lumen-surface-subtle);
+  overflow-y: auto;
+  padding: 8px 10px;
+  gap: 6px;
+}
+
+.lumen-geo-itinerary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--lumen-border);
+}
+
+.lumen-geo-itinerary-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--lumen-text-primary);
+}
+
+.lumen-geo-reverse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--lumen-border);
+  background-color: #ffffff;
+  color: var(--lumen-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-geo-reverse-btn:hover {
+  background-color: var(--lumen-surface-hover);
+  color: var(--lumen-accent);
+  border-color: var(--lumen-accent);
+}
+
+.lumen-geo-travel-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+}
+
+.lumen-geo-travel-mode-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--lumen-text-muted);
+}
+
+.lumen-geo-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  background-color: #ffffff;
+  border: 1px solid var(--lumen-border);
+  color: var(--lumen-text-secondary);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lumen-geo-mode-chip:hover {
+  border-color: var(--lumen-border-strong);
+}
+
+.lumen-geo-mode-chip-active {
+  background-color: var(--lumen-accent-subtle) !important;
+  border-color: var(--lumen-accent) !important;
+  color: var(--lumen-accent) !important;
+  font-weight: 700;
+}
+
+.lumen-geo-stops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.lumen-geo-stop-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background-color: #ffffff;
+  border: 1px solid var(--lumen-border);
+  border-radius: var(--lumen-radius-xs);
+  transition: border-color 0.12s ease;
+}
+
+.lumen-geo-stop-card:hover {
+  border-color: var(--lumen-border-strong);
+}
+
+.lumen-geo-stop-letter {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.lumen-geo-letter-origin {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.lumen-geo-letter-mid {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+
+.lumen-geo-letter-dest {
+  background-color: #ffe4e6;
+  color: #be123c;
+  border: 1px solid #fda4af;
+}
+
+.lumen-geo-stop-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.lumen-geo-stop-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--lumen-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.lumen-geo-stop-addr {
+  font-size: 10px;
+  color: var(--lumen-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.lumen-geo-stop-coords {
+  font-size: 9px;
+  font-family: var(--lumen-font-mono, monospace);
+  color: var(--lumen-text-muted);
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+.lumen-geo-stop-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.lumen-geo-order-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--lumen-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.lumen-geo-order-btn:hover:not(:disabled) {
+  background-color: var(--lumen-surface-hover);
+  color: var(--lumen-text-primary);
+}
+
+.lumen-geo-order-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.lumen-geo-remove-stop-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+  margin-left: 2px;
+}
+
+.lumen-geo-remove-stop-btn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Action Bar: Primary Route Launcher & Controls */
+.lumen-geo-actions {
+  padding: 6px 10px 8px;
+  background-color: #ffffff;
+  border-top: 1px solid var(--lumen-border);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* Prominent Primary Google Maps Route Launcher */
+.lumen-geo-primary-route-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  background-color: #1a73e8;
+  color: #ffffff;
+  border: 1px solid #1557b0;
+  border-radius: var(--lumen-radius-xs, 4px);
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(26, 115, 232, 0.25);
+}
+
+.lumen-geo-primary-route-btn:hover {
+  background-color: #1557b0;
+  border-color: #0d47a1;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(26, 115, 232, 0.35);
+}
+
+.lumen-geo-primary-btn-text {
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-geo-providers-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.lumen-geo-providers-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lumen-text-muted);
+  margin-right: 2px;
+}
+
+.lumen-geo-provider-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 7px;
+  border-radius: var(--lumen-radius-xs);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+/* Waze Button */
+.lumen-geo-chip-waze {
+  background-color: #f0fdfa;
+  color: #0f766e;
+  border-color: #99f6e4;
+}
+
+.lumen-geo-chip-waze:hover {
+  background-color: #ccfbf1;
+  border-color: #14b8a6;
+  color: #0d9488;
+  transform: translateY(-1px);
+}
+
+/* OpenStreetMap Button */
+.lumen-geo-chip-osm {
+  background-color: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.lumen-geo-chip-osm:hover {
+  background-color: #dcfce7;
+  border-color: #22c55e;
+  color: #15803d;
+  transform: translateY(-1px);
+}
+
+/* Apple Maps Button */
+.lumen-geo-chip-apple {
+  background-color: #f8fafc;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.lumen-geo-chip-apple:hover {
+  background-color: #f1f5f9;
+  border-color: #64748b;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.lumen-geo-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: var(--lumen-radius-xs);
+  font-size: 10.5px;
+  color: var(--lumen-text-secondary);
+  background-color: transparent;
+  border: 1px solid var(--lumen-border);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  margin-left: auto;
+}
+
+.lumen-geo-more-btn:hover {
+  background-color: var(--lumen-surface);
+  border-color: var(--lumen-border-strong);
+  color: var(--lumen-text-primary);
+}
+
+/* Dropdown Menu for Extra Services */
+.lumen-geo-dropdown {
+  position: absolute;
+  bottom: 42px;
+  right: 10px;
+  background-color: #ffffff;
+  border: 1px solid var(--lumen-border-strong);
+  border-radius: var(--lumen-radius-sm);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18);
+  padding: 6px;
+  z-index: 100;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: lumenFadeIn 0.15s ease-out;
+}
+
+.lumen-geo-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: var(--lumen-radius-xs);
+  font-size: 11px;
+  color: var(--lumen-text-primary);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.12s ease;
+}
+
+.lumen-geo-dropdown-item:hover {
+  background-color: var(--lumen-surface-subtle);
+  color: var(--lumen-accent);
+}
+
+/* Notes & Directions Annotations */
+.lumen-geo-notes {
+  font-size: 10.5px;
+  color: var(--lumen-text-secondary);
+  line-height: 1.35;
+  padding: 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Google Maps URL Input Form on Card */
+.lumen-geo-url-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.lumen-geo-url-input-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  background-color: var(--lumen-surface);
+  border: 1px solid var(--lumen-border);
+  border-radius: var(--lumen-radius-xs, 4px);
+  transition: all 0.15s ease;
+}
+
+.lumen-geo-url-input-wrap:focus-within {
+  border-color: var(--lumen-accent);
+  box-shadow: 0 0 0 2px var(--lumen-accent-subtle);
+  background-color: #ffffff;
+}
+
+.lumen-geo-url-icon {
+  margin-left: 7px;
+  color: #4285f4;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.lumen-geo-url-input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 6px;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--lumen-text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.lumen-geo-url-input::placeholder {
+  color: var(--lumen-text-muted);
+  font-size: 10px;
+}
+
+.lumen-geo-url-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-muted);
+  cursor: pointer;
+  padding: 3px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.12s ease;
+}
+
+.lumen-geo-url-clear-btn:hover {
+  color: var(--lumen-text-primary);
+}
+
+.lumen-geo-url-paste-btn {
+  background: var(--lumen-accent-subtle, #eff6ff);
+  border: 1px solid var(--lumen-accent, #3b82f6);
+  color: var(--lumen-accent, #2563eb);
+  cursor: pointer;
+  padding: 2px 6px;
+  margin-right: 4px;
+  border-radius: var(--lumen-radius-xs, 4px);
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  transition: all 0.12s ease;
+}
+
+.lumen-geo-url-paste-btn:hover {
+  background: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+}
+
+.lumen-geo-url-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  background-color: var(--lumen-accent);
+  color: #ffffff;
+  border: 1px solid var(--lumen-accent);
+  border-radius: var(--lumen-radius-xs, 4px);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.lumen-geo-url-apply-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.lumen-geo-url-apply-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@keyframes lumenFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Places Search Autocomplete Dropdown on Geo Card */
+.lumen-geo-search-dropdown {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.lumen-geo-search-dropdown-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--lumen-border, #f1f5f9);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background-color 0.12s ease;
+}
+
+.lumen-geo-search-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.lumen-geo-search-dropdown-item:hover {
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+.lumen-geo-search-dropdown-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.lumen-geo-search-dropdown-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-geo-search-dropdown-addr {
+  font-size: 9.5px;
+  color: var(--lumen-text-muted, #94a3b8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

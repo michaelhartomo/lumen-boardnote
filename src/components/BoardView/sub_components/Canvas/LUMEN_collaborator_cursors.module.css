@@ -1,0 +1,60 @@
+/* Remote Collaborator Live Cursors */
+.lumen-cursor-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.lumen-collaborator-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transition: transform 0.045s linear;
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.lumen-cursor-pointer {
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.25));
+}
+
+.lumen-cursor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  margin-left: 14px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+  white-space: nowrap;
+  animation: lumen-cursor-badge-enter 0.15s ease-out;
+}
+
+.lumen-cursor-name {
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+}
+
+@keyframes lumen-cursor-badge-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

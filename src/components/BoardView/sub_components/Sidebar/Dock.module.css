@@ -1,0 +1,951 @@
+/* ==========================================================================
+   Lumen Dock Tool Bar CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumen-dock-container,
+.lumenDockContainer {
+  -lumen-dock-layer: true;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.lumen-dock-bar,
+.lumenDockBar {
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.lumen-dock-divider,
+.lumenDockDivider {
+  height: 1px;
+  background-color: var(--lumen-border, #e2e8f0);
+  margin: 3px 2px;
+}
+
+.lumen-dock-btn,
+.lumenDockBtn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-secondary, #64748b);
+  cursor: pointer;
+  -webkit-user-drag: element;
+  user-drag: element;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.lumen-dock-btn:hover,
+.lumenDockBtn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-dock-btn-active,
+.lumenDockBtnActive {
+  background-color: var(--lumen-accent-subtle, rgba(37, 99, 235, 0.1)) !important;
+  color: var(--lumen-accent, #2563eb) !important;
+}
+
+.lumen-dock-btn-hand-active,
+.lumenDockBtnHandActive {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+  color: #d97706 !important;
+}
+
+.lumen-dock-btn-draw-active,
+.lumenDockBtnDrawActive {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+  color: #dc2626 !important;
+}
+
+.lumen-dock-btn-ai,
+.lumenDockBtnAi {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.08));
+  color: #7c3aed;
+}
+
+.lumen-dock-btn-ai:hover,
+.lumenDockBtnAi:hover {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.15));
+  color: #6d28d9;
+}
+
+@keyframes lumen-dock-ai-spin-anim {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes lumen-dock-ai-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.28);
+  }
+}
+
+.lumen-dock-btn-ai-working {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(124, 58, 237, 0.24)) !important;
+  color: #2563eb !important;
+  animation: lumen-dock-ai-pulse-glow 1.3s ease-in-out infinite;
+}
+
+.lumen-dock-ai-spin {
+  animation: lumen-dock-ai-spin-anim 0.85s linear infinite;
+}
+
+/* ==========================================================================
+   Dark Theme Overrides for Dock Bar & Dock Buttons
+   Prevents colors from becoming dull, washed out, or muted in dark mode
+   ========================================================================== */
+:global([data-theme="dark"]) .lumen-dock-bar,
+:global(.dark) .lumen-dock-bar,
+:global(.lumen-theme-dark) .lumen-dock-bar,
+:global([data-theme="dark"]) .lumenDockBar,
+:global(.dark) .lumenDockBar,
+:global(.lumen-theme-dark) .lumenDockBar {
+  background-color: var(--lumen-surface, #1e293b);
+  border-color: var(--lumen-border, #334155);
+  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.65), 0 2px 8px -1px rgba(0, 0, 0, 0.4);
+}
+
+:global([data-theme="dark"]) .lumen-dock-btn,
+:global(.dark) .lumen-dock-btn,
+:global(.lumen-theme-dark) .lumen-dock-btn,
+:global([data-theme="dark"]) .lumenDockBtn,
+:global(.dark) .lumenDockBtn,
+:global(.lumen-theme-dark) .lumenDockBtn {
+  color: #e2e8f0;
+}
+
+:global([data-theme="dark"]) .lumen-dock-btn:hover,
+:global(.dark) .lumen-dock-btn:hover,
+:global(.lumen-theme-dark) .lumen-dock-btn:hover,
+:global([data-theme="dark"]) .lumenDockBtn:hover,
+:global(.dark) .lumenDockBtn:hover,
+:global(.lumen-theme-dark) .lumenDockBtn:hover {
+  background-color: var(--lumen-surface-hover, #334155);
+  color: #ffffff;
+}
+
+:global([data-theme="dark"]) .lumen-dock-btn-active,
+:global(.dark) .lumen-dock-btn-active,
+:global(.lumen-theme-dark) .lumen-dock-btn-active,
+:global([data-theme="dark"]) .lumenDockBtnActive,
+:global(.dark) .lumenDockBtnActive,
+:global(.lumen-theme-dark) .lumenDockBtnActive {
+  background-color: rgba(56, 189, 248, 0.22) !important;
+  color: var(--lumen-accent, #38bdf8) !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25) !important;
+}
+
+:global([data-theme="dark"]) .lumen-dock-btn-hand-active,
+:global(.dark) .lumen-dock-btn-hand-active,
+:global(.lumen-theme-dark) .lumen-dock-btn-hand-active,
+:global([data-theme="dark"]) .lumenDockBtnHandActive,
+:global(.dark) .lumenDockBtnHandActive,
+:global(.lumen-theme-dark) .lumenDockBtnHandActive {
+  background-color: rgba(245, 158, 11, 0.25) !important;
+  color: #fbbf24 !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25) !important;
+}
+
+:global([data-theme="dark"]) .lumen-dock-btn-draw-active,
+:global(.dark) .lumen-dock-btn-draw-active,
+:global(.lumen-theme-dark) .lumen-dock-btn-draw-active,
+:global([data-theme="dark"]) .lumenDockBtnDrawActive,
+:global(.dark) .lumenDockBtnDrawActive,
+:global(.lumen-theme-dark) .lumenDockBtnDrawActive {
+  background-color: rgba(239, 68, 68, 0.25) !important;
+  color: #f87171 !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.25) !important;
+}
+
+:global([data-theme="dark"]) .lumen-dock-btn-ai,
+:global(.dark) .lumen-dock-btn-ai,
+:global(.lumen-theme-dark) .lumen-dock-btn-ai,
+:global([data-theme="dark"]) .lumenDockBtnAi,
+:global(.dark) .lumenDockBtnAi,
+:global(.lumen-theme-dark) .lumenDockBtnAi {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(192, 132, 252, 0.25)) !important;
+  color: #c084fc !important;
+  border: 1px solid rgba(192, 132, 252, 0.35) !important;
+}
+
+:global([data-theme="dark"]) .lumen-dock-btn-ai:hover,
+:global(.dark) .lumen-dock-btn-ai:hover,
+:global(.lumen-theme-dark) .lumen-dock-btn-ai:hover,
+:global([data-theme="dark"]) .lumenDockBtnAi:hover,
+:global(.dark) .lumenDockBtnAi:hover,
+:global(.lumen-theme-dark) .lumenDockBtnAi:hover {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(192, 132, 252, 0.35)) !important;
+  color: #e9d5ff !important;
+}
+
+:global([data-theme="dark"]) .lumen-dock-divider,
+:global(.dark) .lumen-dock-divider,
+:global(.lumen-theme-dark) .lumen-dock-divider,
+:global([data-theme="dark"]) .lumenDockDivider,
+:global(.dark) .lumenDockDivider,
+:global(.lumen-theme-dark) .lumenDockDivider {
+  background-color: var(--lumen-border, #334155);
+}
+
+.lumen-dock-card-menu,
+.lumenDockCardMenu {
+  position: fixed;
+  top: 16px;
+  left: 68px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 20px;
+  padding: 0;
+  width: 520px;
+  min-width: 320px;
+  max-width: calc(100vw - 80px);
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.18), 0 8px 20px -6px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  max-height: min(600px, calc(100vh - 40px));
+  overflow: hidden;
+  z-index: 1201;
+  animation: lumenFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.lumen-dock-backdrop,
+.lumenDockBackdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background-color: transparent;
+  z-index: 1200;
+}
+
+.lumen-dock-pull-handle,
+.lumenDockPullHandle {
+  display: none;
+}
+
+.lumen-dock-card-menu-header,
+.lumenDockCardMenuHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 14px 18px 12px 18px;
+  border-bottom: 1px solid var(--lumen-border, #f1f5f9);
+  flex-shrink: 0;
+  background-color: var(--lumen-surface, #ffffff);
+  box-sizing: border-box;
+}
+
+.lumen-dock-card-menu-header-top,
+.lumenDockCardMenuHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.lumen-dock-card-menu-title-wrap,
+.lumenDockCardMenuTitleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lumen-dock-card-menu-title,
+.lumenDockCardMenuTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.lumen-dock-card-menu-sub,
+.lumenDockCardMenuSub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--lumen-text-muted, #64748b);
+  margin: 0;
+}
+
+.lumen-dock-card-search-wrap,
+.lumenDockCardSearchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--lumen-bg-secondary, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 7px 10px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lumen-dock-card-search-wrap:focus-within,
+.lumenDockCardSearchWrap:focus-within {
+  border-color: var(--lumen-accent, #7c3aed);
+  background-color: var(--lumen-surface, #ffffff);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.lumen-dock-card-search-icon,
+.lumenDockCardSearchIcon {
+  color: var(--lumen-text-muted, #64748b);
+  flex-shrink: 0;
+}
+
+.lumen-dock-card-search-input,
+.lumenDockCardSearchInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lumen-text-primary, #0f172a);
+  font-family: inherit;
+}
+
+.lumen-dock-card-search-input::placeholder,
+.lumenDockCardSearchInput::placeholder {
+  color: var(--lumen-text-muted, #94a3b8);
+  font-weight: 400;
+}
+
+.lumen-dock-card-search-count,
+.lumenDockCardSearchCount {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--lumen-accent, #7c3aed);
+  background-color: rgba(124, 58, 237, 0.1);
+  padding: 2px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.lumen-dock-card-search-clear,
+.lumenDockCardSearchClear {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--lumen-text-muted, #64748b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.lumen-dock-card-search-clear:hover,
+.lumenDockCardSearchClear:hover {
+  background-color: rgba(148, 163, 184, 0.18);
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-dock-card-empty,
+.lumenDockCardEmpty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 20px;
+  gap: 6px;
+}
+
+.lumen-dock-card-empty-icon,
+.lumenDockCardEmptyIcon {
+  color: var(--lumen-text-muted, #94a3b8);
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
+
+.lumen-dock-card-empty-title,
+.lumenDockCardEmptyTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-dock-card-empty-sub,
+.lumenDockCardEmptySub {
+  margin: 0;
+  font-size: 12px;
+  color: var(--lumen-text-muted, #64748b);
+  max-width: 280px;
+  line-height: 1.45;
+}
+
+.lumen-dock-card-empty-reset,
+.lumenDockCardEmptyReset {
+  margin-top: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  background-color: var(--lumen-surface, #ffffff);
+  color: var(--lumen-text-primary, #0f172a);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.lumen-dock-card-empty-reset:hover,
+.lumenDockCardEmptyReset:hover {
+  background-color: var(--lumen-bg-secondary, #f8fafc);
+  border-color: #cbd5e1;
+}
+
+.lumen-dock-card-menu-scroll,
+.lumenDockCardMenuScroll {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px 20px 18px;
+  box-sizing: border-box;
+}
+
+.lumen-dock-card-menu-scroll::-webkit-scrollbar,
+.lumenDockCardMenuScroll::-webkit-scrollbar {
+  width: 6px;
+}
+.lumen-dock-card-menu-scroll::-webkit-scrollbar-thumb,
+.lumenDockCardMenuScroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.lumen-dock-card-menu-scroll::-webkit-scrollbar-track,
+.lumenDockCardMenuScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Card Item Component - True Card Layout on Desktop and Mobile */
+.lumen-dock-card-item,
+.lumenDockCardItem {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 18px;
+  padding: 12px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: element;
+  user-drag: element;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  box-sizing: border-box;
+  min-width: 200px;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+}
+
+.lumen-dock-card-item:hover,
+.lumenDockCardItem:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px -4px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+  border-color: #cbd5e1;
+}
+
+.lumen-dock-card-item:active,
+.lumenDockCardItem:active {
+  cursor: grabbing;
+  transform: translateY(0);
+}
+
+/* Top Banner / Image Area */
+.lumen-dock-card-image,
+.lumenDockCardImage {
+  width: 100%;
+  height: 116px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.lumen-dock-card-image-icon,
+.lumenDockCardImageIcon {
+  color: #ffffff;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lumen-dock-card-img,
+.lumenDockCardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lumen-dock-card-item:hover .lumen-dock-card-img,
+.lumenDockCardItem:hover .lumenDockCardImg {
+  transform: scale(1.05);
+}
+
+.lumen-dock-card-item:hover .lumen-dock-card-image-icon,
+.lumenDockCardItem:hover .lumenDockCardImageIcon {
+  transform: scale(1.1);
+}
+
+.lumen-dock-card-drag-hint,
+.lumenDockCardDragHint {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.lumen-dock-card-item:hover .lumen-dock-card-drag-hint,
+.lumenDockCardItem:hover .lumenDockCardDragHint {
+  opacity: 1;
+}
+
+/* Title and Description */
+.lumen-dock-card-info,
+.lumenDockCardInfo {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 2px 4px 2px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 4px;
+}
+
+.lumen-dock-card-title,
+.lumenDockCardTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.lumen-dock-card-desc,
+.lumenDockCardDesc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--lumen-text-muted, #64748b);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  min-height: 35px;
+}
+
+/* Bottom Row with Price / Badge and Add Button */
+.lumen-dock-card-bottom,
+.lumenDockCardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--lumen-border, #f1f5f9);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lumen-dock-card-price,
+.lumenDockCardPrice {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.lumen-dock-card-actions,
+.lumenDockCardActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lumen-dock-card-encrypt-btn,
+.lumenDockCardEncryptBtn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--lumen-accent, #2563eb);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.16s ease, background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  flex-shrink: 0;
+}
+
+.lumen-dock-card-encrypt-btn:hover,
+.lumenDockCardEncryptBtn:hover {
+  background: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  border-color: var(--lumen-accent, #2563eb);
+  transform: scale(1.08);
+}
+
+.lumen-dock-card-add-btn,
+.lumenDockCardAddBtn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.35);
+  transition: transform 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+  flex-shrink: 0;
+}
+
+.lumen-dock-card-add-btn:hover,
+.lumenDockCardAddBtn:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(124, 58, 237, 0.45);
+}
+
+.lumen-dock-card-add-btn:active,
+.lumenDockCardAddBtn:active {
+  transform: scale(0.95);
+}
+
+.lumen-dock-backdrop,
+.lumenDockBackdrop {
+  display: none;
+}
+
+.lumen-dock-card-menu-close,
+.lumenDockCardMenuClose {
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-muted, #94a3b8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .lumen-dock-container-drawing-hidden,
+  .lumenDockContainerDrawingHidden {
+    display: none !important;
+  }
+
+  .lumen-dock-container,
+  .lumenDockContainer {
+    top: auto;
+    bottom: 14px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    transform: none !important;
+    flex-direction: row;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .lumen-dock-bar,
+  .lumenDockBar {
+    flex-direction: row;
+    padding: 5px 8px;
+    border-radius: 999px;
+    gap: 4px;
+    max-width: calc(100vw - 16px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+  }
+
+  .lumen-dock-bar::-webkit-scrollbar,
+  .lumenDockBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .lumen-dock-divider,
+  .lumenDockDivider {
+    width: 1px;
+    height: 20px;
+    margin: auto 4px;
+  }
+
+  .lumen-dock-btn,
+  .lumenDockBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+  }
+
+  .lumen-dock-backdrop,
+  .lumenDockBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 1200;
+    animation: lumenFadeIn 0.15s ease-out;
+  }
+
+  .lumen-dock-pull-handle,
+  .lumenDockPullHandle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: #cbd5e1;
+    margin: 0 auto 10px auto;
+    flex-shrink: 0;
+  }
+
+  .lumen-dock-card-menu,
+  .lumenDockCardMenu {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    max-height: 82vh;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.25);
+    z-index: 1201;
+    padding: 12px 16px max(24px, env(safe-area-inset-bottom, 24px)) 16px;
+    animation: lumenSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+    border-top: 1px solid var(--lumen-border, #e2e8f0);
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .lumen-dock-card-menu-header,
+  .lumenDockCardMenuHeader {
+    padding: 0 4px 12px 4px;
+    border-bottom: 1px solid var(--lumen-border, #f1f5f9);
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .lumen-dock-card-menu-scroll,
+  .lumenDockCardMenuScroll {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    padding: 14px 4px 24px 4px;
+    box-sizing: border-box;
+  }
+
+  /* Keep authentic Card Layout on Mobile - Image, Title, Desc, and Add button */
+  .lumen-dock-card-item,
+  .lumenDockCardItem {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    border-radius: 18px;
+    gap: 0;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  }
+
+  .lumen-dock-card-image,
+  .lumenDockCardImage {
+    width: 100%;
+    height: 140px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  .lumen-dock-card-info,
+  .lumenDockCardInfo {
+    padding: 10px 2px 6px 2px;
+    flex: 1;
+    min-width: 0;
+    gap: 4px;
+    box-sizing: border-box;
+  }
+
+  .lumen-dock-card-title,
+  .lumenDockCardTitle {
+    font-size: 15px;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lumen-dock-card-desc,
+  .lumenDockCardDesc {
+    font-size: 12.5px;
+    line-height: 1.45;
+    min-height: 36px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lumen-dock-card-bottom,
+  .lumenDockCardBottom {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--lumen-border, #f1f5f9);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lumen-dock-card-price,
+  .lumenDockCardPrice {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .lumen-dock-card-add-btn,
+  .lumenDockCardAddBtn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 50%;
+  }
+}
+
+@media (min-width: 520px) and (max-width: 768px) {
+  .lumen-dock-card-menu-scroll,
+  .lumenDockCardMenuScroll {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .lumen-dock-card-image,
+  .lumenDockCardImage {
+    height: 120px;
+  }
+}
+
+@keyframes lumenSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes lumenFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

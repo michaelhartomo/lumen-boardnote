@@ -1,0 +1,611 @@
+/* ==========================================================================
+   Lumen Canvas (Free Grid Workspace) CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumenCanvasContainer {
+  -lumen-canvas-mode: free-grid;
+  -lumen-viewport: spatial-2d;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: auto;
+  overflow: hidden;
+  background-color: var(--lumen-canvas-bg);
+  cursor: default;
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+
+.lumenCanvasContainerDrawing,
+.lumenCanvasContainerDrawing * {
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+}
+
+.lumenCanvasContainerHand,
+.lumenCanvasContainerHand * {
+  cursor: grab !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+}
+
+.lumenCanvasContainerPanning,
+.lumenCanvasContainerPanning * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+}
+
+.lumenCanvasContainerHand .lumenViewport,
+.lumenCanvasContainerHand .lumenViewport *,
+.lumenCanvasContainerHand iframe,
+.lumenCanvasContainerHand video,
+.lumenCanvasContainerHand audio {
+  pointer-events: none !important;
+}
+
+/* Spatial Canvas Grid Background Layers */
+.lumenGridDots,
+.lumenGridLines,
+.lumenGridCrosses,
+.lumen-grid-dots,
+.lumen-grid-lines,
+.lumen-grid-crosses {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+/* 1. Dot Matrix Pattern */
+.lumenGridDots,
+.lumen-grid-dots {
+  -lumen-pattern: dot-matrix;
+  background-image: radial-gradient(var(--lumen-canvas-dot, rgba(0, 0, 0, 0.25)) 1.25px, transparent 1.25px);
+  background-repeat: repeat;
+}
+
+/* 2. Graph Grid Lines Pattern */
+.lumenGridLines,
+.lumen-grid-lines {
+  -lumen-pattern: graph-grid;
+  background-image:
+    linear-gradient(to right, var(--lumen-canvas-dot, rgba(0, 0, 0, 0.20)) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--lumen-canvas-dot, rgba(0, 0, 0, 0.20)) 1px, transparent 1px);
+  background-repeat: repeat;
+}
+
+/* 3. Technical Crosses Pattern */
+.lumenGridCrosses,
+.lumen-grid-crosses {
+  -lumen-pattern: technical-crosses;
+  background-image:
+    linear-gradient(to right, var(--lumen-canvas-dot, rgba(0, 0, 0, 0.30)) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--lumen-canvas-dot, rgba(0, 0, 0, 0.30)) 1px, transparent 1px);
+  background-repeat: repeat;
+  mask-image: radial-gradient(circle at 0px 0px, black 4.5px, transparent 5px);
+  -webkit-mask-image: radial-gradient(circle at 0px 0px, black 4.5px, transparent 5px);
+  mask-repeat: repeat;
+  -webkit-mask-repeat: repeat;
+}
+
+.lumenGridDotsFree,
+.lumen-grid-dots-free {
+  opacity: 0.35;
+}
+
+/* Spatial Viewport Layer with Transform Matrix */
+.lumenViewport {
+  -lumen-transform-layer: active-board;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* Drop Preview Ghost while dragging from dock */
+.lumenDropGhost {
+  -lumen-visual: drop-preview;
+  position: absolute;
+  border: 2px dashed var(--lumen-accent);
+  background-color: rgba(37, 99, 235, 0.08);
+  border-radius: var(--lumen-radius-md);
+  pointer-events: none;
+  z-index: 1000;
+  transition: all 0.05s ease-out;
+}
+
+/* Empty Canvas Hint */
+.lumenEmptyHint {
+  position: absolute;
+  top: 240px;
+  left: 360px;
+  max-width: 400px;
+  padding: 24px;
+  background-color: var(--lumen-surface);
+  border: 1px dashed var(--lumen-border-strong);
+  border-radius: var(--lumen-radius-lg);
+  color: var(--lumen-text-secondary);
+  text-align: center;
+  box-shadow: var(--lumen-shadow-sm);
+  pointer-events: none;
+  user-select: none;
+}
+
+.lumenEmptyHintTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--lumen-text-primary);
+  margin-bottom: 6px;
+}
+
+.lumenEmptyHintText {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--lumen-text-secondary);
+}
+
+/* Subtle Canvas Mode Indicator in Bottom Corner */
+.lumenCanvasStatusBadge {
+  position: absolute;
+  bottom: 16px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: var(--lumen-surface-elevated);
+  border: 1px solid var(--lumen-border);
+  border-radius: var(--lumen-radius-sm);
+  box-shadow: var(--lumen-shadow-xs);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--lumen-text-secondary);
+  pointer-events: none;
+  z-index: 50;
+  user-select: none;
+}
+
+.lumenCanvasStatusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.lumenCanvasStatusDotGrid {
+  background-color: #2563eb;
+}
+
+.lumenCanvasStatusDotFree {
+  background-color: #d97706;
+}
+
+/* Floating Tag Filter Banner */
+.lumenActiveTagFilterBanner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background-color: var(--lumen-surface-elevated);
+  border: 1px solid var(--lumen-border-strong);
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--lumen-text-primary);
+  z-index: 100;
+  animation: lumenFilterSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lumenFilterSlideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.lumenClearFilterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  background-color: var(--lumen-surface);
+  border: 1px solid var(--lumen-border);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lumen-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumenClearFilterBtn:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+/* Selection Marquee (Rubberband Drag Box) */
+.lumenSelectionMarquee {
+  position: absolute;
+  border: 1.5px dashed var(--lumen-accent, #2563eb);
+  background-color: rgba(37, 99, 235, 0.08);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 950;
+  box-sizing: border-box;
+}
+
+.lumenMarqueeCountBadge {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  background-color: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Multi-Selection Floating Action Bar (Responsive Multiline & Touch Scrollable) */
+.lumenMultiSelectBar,
+.lumen-multi-select-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1.5px solid var(--lumen-border-strong, #cbd5e1);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 850;
+  animation: lumenMultiSelectSlideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  max-width: min(94vw, 860px);
+  backdrop-filter: blur(12px);
+  box-sizing: border-box;
+}
+
+@keyframes lumenMultiSelectSlideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.lumenMultiSelectHeader,
+.lumen-multi-select-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--lumen-border-subtle, #f1f5f9);
+  box-sizing: border-box;
+}
+
+.lumenMultiSelectCount,
+.lumen-multi-select-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.lumenMultiSelectCountText,
+.lumen-multi-select-count-text {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+.lumenMultiSelectHint,
+.lumen-multi-select-hint {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--lumen-text-muted, #64748b);
+  background: var(--lumen-surface-subtle, #f8fafc);
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  white-space: nowrap;
+}
+
+.lumenMultiSelectCloseBtn,
+.lumen-multi-select-close-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--lumen-text-muted, #64748b);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.lumenMultiSelectCloseBtn:hover,
+.lumen-multi-select-close-btn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+  border-color: var(--lumen-border-strong, #cbd5e1);
+}
+
+.lumenMultiSelectCloseLabel,
+.lumen-multi-select-close-label {
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.lumenMultiSelectActionsRow,
+.lumen-multi-select-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap; /* Multiline on wider screens */
+  box-sizing: border-box;
+}
+
+.lumenMultiSelectGroup,
+.lumen-multi-select-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.lumenMultiSelectDivider,
+.lumen-multi-select-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--lumen-border, #e2e8f0);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+.lumenMultiSelectActionBtn,
+.lumen-multi-select-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 13px;
+  background-color: var(--lumen-surface-subtle, #f8fafc);
+  color: var(--lumen-text-primary, #1e293b);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.lumenMultiSelectActionBtn:hover,
+.lumen-multi-select-action-btn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  border-color: var(--lumen-border-strong, #cbd5e1);
+  color: var(--lumen-text-primary, #0f172a);
+  transform: translateY(-1px);
+}
+
+.lumenMultiSelectActionBtn:active,
+.lumen-multi-select-action-btn:active {
+  transform: translateY(0);
+}
+
+.lumenMultiSelectGroupBtn,
+.lumen-multi-select-group-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 13px;
+  background-color: var(--lumen-surface-subtle, #f8fafc);
+  color: var(--lumen-text-primary, #1e293b);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.lumenMultiSelectGroupBtn:hover,
+.lumen-multi-select-group-btn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  border-color: var(--lumen-border-strong, #cbd5e1);
+  color: var(--lumen-text-primary, #0f172a);
+  transform: translateY(-1px);
+}
+
+.lumenMultiSelectGroupBtn:active,
+.lumen-multi-select-group-btn:active {
+  transform: translateY(0);
+}
+
+.lumenMultiSelectAiBtn,
+.lumen-multi-select-ai-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 14px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  transition: all 0.14s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.lumenMultiSelectAiBtn:hover,
+.lumen-multi-select-ai-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.lumenMultiSelectAiBtn:active,
+.lumen-multi-select-ai-btn:active {
+  transform: translateY(0);
+}
+
+.lumenMultiSelectDeleteBtn,
+.lumen-multi-select-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 13px;
+  background-color: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.lumenMultiSelectDeleteBtn:hover,
+.lumen-multi-select-delete-btn:hover {
+  background-color: #ffe4e6;
+  border-color: #fda4af;
+  color: #be123c;
+  transform: translateY(-1px);
+}
+
+.lumenMultiSelectDeleteBtn:active,
+.lumen-multi-select-delete-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive adjustments: elevated above dock & clean multiline/scrollable layout */
+@media (max-width: 768px) {
+  .lumenMultiSelectBar,
+  .lumen-multi-select-bar {
+    bottom: 76px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+    max-width: calc(100vw - 20px);
+    width: calc(100vw - 20px);
+    padding: 9px 10px;
+    border-radius: 13px;
+    gap: 8px;
+  }
+
+  .lumenMultiSelectHint,
+  .lumen-multi-select-hint {
+    display: none;
+  }
+
+  .lumenMultiSelectActionsRow,
+  .lumen-multi-select-actions-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .lumenMultiSelectGroup,
+  .lumen-multi-select-group {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .lumenMultiSelectDivider,
+  .lumen-multi-select-divider {
+    display: none;
+  }
+
+  .lumenMultiSelectActionBtn,
+  .lumen-multi-select-action-btn,
+  .lumenMultiSelectGroupBtn,
+  .lumen-multi-select-group-btn,
+  .lumenMultiSelectAiBtn,
+  .lumen-multi-select-ai-btn,
+  .lumenMultiSelectDeleteBtn,
+  .lumen-multi-select-delete-btn {
+    height: 32px;
+    min-height: 32px;
+    padding: 0 9px;
+    font-size: 11.5px;
+  }
+}
+

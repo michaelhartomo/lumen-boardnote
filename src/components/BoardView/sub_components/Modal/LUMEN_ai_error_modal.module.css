@@ -1,0 +1,350 @@
+/* ==========================================================================
+   Lumen AI Error Modal Popup CSS Module
+   Vendor Prefix: 'lumen'
+   ========================================================================== */
+
+.lumen-ai-error-backdrop,
+.lumenAiErrorBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: lumenAiErrorFadeIn 0.16s ease-out;
+}
+
+@keyframes lumenAiErrorFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.lumen-ai-error-window,
+.lumenAiErrorWindow {
+  background-color: var(--lumen-surface, #ffffff);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 14px;
+  width: 480px;
+  max-width: 94vw;
+  max-height: 88vh;
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.28), 0 8px 16px -6px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lumen-ai-error-header,
+.lumenAiErrorHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-ai-error-header-left,
+.lumenAiErrorHeaderLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.lumen-ai-error-icon-box,
+.lumenAiErrorIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.lumen-ai-error-theme-warn {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+  border-color: rgba(217, 119, 6, 0.25) !important;
+}
+
+.lumen-ai-error-theme-quota {
+  background-color: #ffedd5 !important;
+  color: #ea580c !important;
+  border-color: rgba(234, 88, 12, 0.25) !important;
+}
+
+.lumen-ai-error-theme-danger {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+.lumen-ai-error-title-wrap,
+.lumenAiErrorTitleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lumen-ai-error-badge-row,
+.lumenAiErrorBadgeRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.lumen-ai-error-badge,
+.lumenAiErrorBadge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+}
+
+.lumen-ai-error-code-pill,
+.lumenAiErrorCodePill {
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: var(--lumen-font-mono, monospace);
+  padding: 2px 6px;
+  border-radius: 5px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border: 1px solid var(--lumen-border, #cbd5e1);
+  color: var(--lumen-text-secondary, #475569);
+}
+
+.lumen-ai-error-title,
+.lumenAiErrorTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--lumen-text-primary, #0f172a);
+  line-height: 1.3;
+}
+
+.lumen-ai-error-close-btn,
+.lumenAiErrorCloseBtn {
+  background: transparent;
+  border: none;
+  color: var(--lumen-text-muted, #94a3b8);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lumen-ai-error-close-btn:hover,
+.lumenAiErrorCloseBtn:hover {
+  background-color: var(--lumen-surface-hover, #f1f5f9);
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-ai-error-body,
+.lumenAiErrorBody {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.lumen-ai-error-meta-bar,
+.lumenAiErrorMetaBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  font-size: 11.5px;
+}
+
+.lumen-ai-error-meta-item,
+.lumenAiErrorMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--lumen-text-secondary, #475569);
+}
+
+.lumen-ai-error-meta-label,
+.lumenAiErrorMetaLabel {
+  font-weight: 600;
+  color: var(--lumen-text-muted, #64748b);
+}
+
+.lumen-ai-error-meta-value,
+.lumenAiErrorMetaValue {
+  font-weight: 600;
+  color: var(--lumen-text-primary, #0f172a);
+}
+
+.lumen-ai-error-message-box,
+.lumenAiErrorMessageBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lumen-ai-error-message,
+.lumenAiErrorMessage {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--lumen-text-primary, #0f172a);
+  font-weight: 500;
+}
+
+.lumen-ai-error-details,
+.lumenAiErrorDetails {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--lumen-text-secondary, #475569);
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border: 1px solid var(--lumen-border, #e2e8f0);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-family: var(--lumen-font-mono, monospace);
+  word-break: break-word;
+}
+
+.lumen-ai-error-quota-card,
+.lumenAiErrorQuotaCard {
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 9px;
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.lumen-ai-error-quota-title,
+.lumenAiErrorQuotaTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #9a3412;
+}
+
+.lumen-ai-error-quota-grid,
+.lumenAiErrorQuotaGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lumen-ai-error-quota-metric,
+.lumenAiErrorQuotaMetric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lumen-ai-error-quota-metric-top,
+.lumenAiErrorQuotaMetricTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #7c2d12;
+}
+
+.lumen-ai-error-quota-bar-bg,
+.lumenAiErrorQuotaBarBg {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background-color: #ffedd5;
+  overflow: hidden;
+}
+
+.lumen-ai-error-quota-bar-fill,
+.lumenAiErrorQuotaBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background-color: #ea580c;
+  transition: width 0.25s ease;
+}
+
+.lumen-ai-error-suggestion-box,
+.lumenAiErrorSuggestionBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+}
+
+.lumen-ai-error-suggestion-icon,
+.lumenAiErrorSuggestionIcon {
+  color: var(--lumen-accent, #2563eb);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.lumen-ai-error-suggestion-text,
+.lumenAiErrorSuggestionText {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--lumen-text-secondary, #334155);
+}
+
+.lumen-ai-error-footer,
+.lumenAiErrorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px 14px;
+  background-color: var(--lumen-canvas-bg, #f8fafc);
+  border-top: 1px solid var(--lumen-border, #e2e8f0);
+}
+
+.lumen-ai-error-primary-btn,
+.lumenAiErrorPrimaryBtn {
+  height: 34px;
+  padding: 0 18px;
+  border-radius: 7px;
+  border: 1px solid var(--lumen-accent, #2563eb);
+  background-color: var(--lumen-accent, #2563eb);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.lumen-ai-error-primary-btn:hover,
+.lumenAiErrorPrimaryBtn:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}

@@ -1,0 +1,868 @@
+.lumen-clock-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(165deg, #0f172a 0%, #090d16 100%);
+  color: #f8fafc;
+  font-family: var(--lumen-card-font, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  border-radius: inherit;
+  overflow: hidden;
+  user-select: none;
+  position: relative;
+}
+
+.lumen-clock-theme-light {
+  background: linear-gradient(165deg, #ffffff 0%, #f1f5f9 100%);
+  color: #0f172a;
+}
+
+/* Top Header Bar */
+.lumen-clock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.55);
+  flex-shrink: 0;
+}
+
+.lumen-clock-theme-light .lumen-clock-header {
+  background: rgba(248, 250, 252, 0.85);
+  border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+
+.lumen-clock-mode-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(30, 41, 59, 0.75);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  flex: 1;
+  min-width: 0;
+}
+
+.lumen-clock-theme-light .lumen-clock-mode-tabs {
+  background: #e2e8f0;
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.lumen-clock-mode-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.lumen-clock-theme-light .lumen-clock-mode-tab {
+  color: #475569;
+}
+
+.lumen-clock-mode-tab:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lumen-clock-theme-light .lumen-clock-mode-tab:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.lumen-clock-mode-tab-active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+
+.lumen-clock-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.lumen-clock-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(30, 41, 59, 0.6);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-clock-theme-light .lumen-clock-icon-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.lumen-clock-icon-btn:hover {
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.lumen-clock-icon-btn-active {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+/* Ringing Banner for Countdown / Alarm */
+.lumen-clock-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(90deg, #dc2626 0%, #ea580c 100%);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 700;
+  animation: lumen-clock-pulse 1s infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes lumen-clock-pulse {
+  0% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.lumen-clock-alert-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lumen-clock-alert-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.lumen-clock-alert-btn {
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lumen-clock-alert-btn:hover {
+  background: rgba(0, 0, 0, 0.42);
+}
+
+/* Main Body Area */
+.lumen-clock-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  gap: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.lumen-clock-body-seamless {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* UTC Bar */
+.lumen-clock-utc-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  flex-shrink: 0;
+}
+
+.lumen-clock-theme-light .lumen-clock-utc-bar {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.lumen-clock-utc-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.lumen-clock-theme-light .lumen-clock-utc-label {
+  color: #64748b;
+}
+
+.lumen-clock-utc-select {
+  flex: 1;
+  min-width: 0;
+  background: rgba(15, 23, 42, 0.75);
+  color: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.lumen-clock-theme-light .lumen-clock-utc-select {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.lumen-clock-utc-select:focus {
+  border-color: #3b82f6;
+}
+
+/* Realtime Clock Display */
+.lumen-clock-stage {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 35%, rgba(59, 130, 246, 0.13) 0%, rgba(15, 23, 42, 0.4) 75%);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.lumen-clock-stage-seamless {
+  height: 100%;
+  border: none;
+  border-radius: inherit;
+  padding: 12px 14px;
+}
+
+.lumen-clock-stage-landscape {
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 16px;
+}
+
+.lumen-clock-stage-main-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.lumen-clock-theme-light .lumen-clock-stage {
+  background: radial-gradient(circle at 50% 35%, rgba(59, 130, 246, 0.08) 0%, rgba(241, 245, 249, 0.8) 75%);
+  border-color: #e2e8f0;
+}
+
+/* Analog Clock SVG Dial */
+.lumen-clock-analog-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lumen-clock-analog-svg {
+  width: var(--lumen-clock-dial-size, 112px);
+  height: var(--lumen-clock-dial-size, 112px);
+  overflow: visible;
+  transition: width 0.08s ease-out, height 0.08s ease-out;
+}
+
+.lumen-clock-dial-ring {
+  fill: rgba(15, 23, 42, 0.65);
+  stroke: rgba(148, 163, 184, 0.28);
+  stroke-width: 2;
+}
+
+.lumen-clock-theme-light .lumen-clock-dial-ring {
+  fill: #ffffff;
+  stroke: #cbd5e1;
+}
+
+.lumen-clock-dial-tick {
+  stroke: rgba(148, 163, 184, 0.45);
+  stroke-linecap: round;
+}
+
+.lumen-clock-theme-light .lumen-clock-dial-tick {
+  stroke: #94a3b8;
+}
+
+.lumen-clock-dial-tick-major {
+  stroke: #60a5fa;
+  stroke-width: 2;
+}
+
+.lumen-clock-hand-hour {
+  stroke: #f8fafc;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+}
+
+.lumen-clock-theme-light .lumen-clock-hand-hour {
+  stroke: #0f172a;
+}
+
+.lumen-clock-hand-minute {
+  stroke: #93c5fd;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.lumen-clock-theme-light .lumen-clock-hand-minute {
+  stroke: #2563eb;
+}
+
+.lumen-clock-hand-second {
+  stroke: #f97316;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.lumen-clock-center-dot {
+  fill: #3b82f6;
+  stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+/* Digital Readout */
+.lumen-clock-digital-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  line-height: 1;
+  font-family: var(--lumen-card-font, 'JetBrains Mono', 'Fira Code', monospace);
+  max-width: 100%;
+}
+
+.lumen-clock-digital-main {
+  font-size: var(--lumen-clock-main-size, 38px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #f8fafc;
+  font-family: var(--lumen-card-font, 'JetBrains Mono', 'Fira Code', monospace);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.lumen-clock-theme-light .lumen-clock-digital-main {
+  color: #0f172a;
+}
+
+.lumen-clock-digital-main-large {
+  font-size: var(--lumen-clock-main-large-size, 46px);
+}
+
+.lumen-clock-digital-sec {
+  font-size: var(--lumen-clock-sec-size, 20px);
+  font-weight: 700;
+  color: #60a5fa;
+  font-family: var(--lumen-card-font, 'JetBrains Mono', 'Fira Code', monospace);
+  white-space: nowrap;
+}
+
+.lumen-clock-digital-ampm {
+  font-size: var(--lumen-clock-ampm-size, 12px);
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+  letter-spacing: 0.04em;
+  margin-left: 2px;
+  font-family: var(--lumen-card-font, inherit);
+}
+
+.lumen-clock-theme-light .lumen-clock-digital-ampm {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+/* Date & Timezone Badge Row */
+.lumen-clock-date-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-align: center;
+  font-family: var(--lumen-card-font, inherit);
+}
+
+.lumen-clock-date-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--lumen-clock-date-size, 12.5px);
+  font-weight: 600;
+  color: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  font-family: var(--lumen-card-font, inherit);
+}
+
+.lumen-clock-theme-light .lumen-clock-date-text {
+  background: #ffffff;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+.lumen-clock-tz-caption {
+  font-size: var(--lumen-clock-tz-size, 10.5px);
+  font-weight: 500;
+  color: #94a3b8;
+  font-family: var(--lumen-card-font, inherit);
+}
+
+.lumen-clock-theme-light .lumen-clock-tz-caption {
+  color: #64748b;
+}
+
+/* Quick Toggle Pills Bar at bottom of Clock mode */
+.lumen-clock-quick-toggles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.lumen-clock-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(30, 41, 59, 0.55);
+  color: #cbd5e1;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-clock-theme-light .lumen-clock-pill-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.lumen-clock-pill-btn:hover {
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.lumen-clock-pill-btn-active {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.lumen-clock-theme-light .lumen-clock-pill-btn-active {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+/* Stopwatch & Countdown Controls */
+.lumen-clock-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lumen-clock-ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(30, 41, 59, 0.75);
+  color: #f8fafc;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-clock-theme-light .lumen-clock-ctrl-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.lumen-clock-ctrl-btn:hover:not(:disabled) {
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+}
+
+.lumen-clock-ctrl-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lumen-clock-ctrl-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #3b82f6;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+}
+
+.lumen-clock-ctrl-warn {
+  background: linear-gradient(135deg, #ea580c 0%, #d97706 100%);
+  border-color: #f59e0b;
+  color: #ffffff !important;
+}
+
+/* Stopwatch Laps List */
+.lumen-clock-laps-list {
+  flex: 1;
+  min-height: 70px;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  scrollbar-width: thin;
+}
+
+.lumen-clock-theme-light .lumen-clock-laps-list {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.lumen-clock-lap-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--lumen-card-font, 'JetBrains Mono', 'Fira Code', monospace);
+}
+
+.lumen-clock-lap-item:last-child {
+  border-bottom: none;
+}
+
+.lumen-clock-lap-num {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.lumen-clock-lap-split {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.lumen-clock-lap-total {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.lumen-clock-theme-light .lumen-clock-lap-total {
+  color: #0f172a;
+}
+
+/* Countdown Configuration & Progress */
+.lumen-clock-progress-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+
+.lumen-clock-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+  transition: width 0.2s linear;
+}
+
+.lumen-clock-countdown-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.lumen-clock-time-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.lumen-clock-time-field-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+}
+
+.lumen-clock-time-num-input {
+  width: 54px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.75);
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  font-family: var(--lumen-card-font, 'JetBrains Mono', 'Fira Code', monospace);
+  outline: none;
+}
+
+.lumen-clock-theme-light .lumen-clock-time-num-input {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.lumen-clock-time-num-input:focus {
+  border-color: #3b82f6;
+}
+
+.lumen-clock-preset-chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.lumen-clock-preset-chip {
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(30, 41, 59, 0.55);
+  color: #cbd5e1;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lumen-clock-theme-light .lumen-clock-preset-chip {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.lumen-clock-preset-chip:hover {
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+/* Alarm Mode */
+.lumen-clock-alarm-add-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.lumen-clock-alarm-time-input {
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.78);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--lumen-card-font, 'JetBrains Mono', 'Fira Code', monospace);
+  outline: none;
+}
+
+.lumen-clock-theme-light .lumen-clock-alarm-time-input {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.lumen-clock-alarm-label-input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.78);
+  color: #f8fafc;
+  font-size: 11.5px;
+  font-family: var(--lumen-card-font, inherit);
+  outline: none;
+}
+
+.lumen-clock-theme-light .lumen-clock-alarm-label-input {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.lumen-clock-alarms-list {
+  flex: 1;
+  min-height: 70px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  scrollbar-width: thin;
+}
+
+.lumen-clock-alarm-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.lumen-clock-theme-light .lumen-clock-alarm-item {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.lumen-clock-alarm-item-disabled {
+  opacity: 0.52;
+}
+
+.lumen-clock-alarm-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.lumen-clock-alarm-time {
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--lumen-card-font, 'JetBrains Mono', 'Fira Code', monospace);
+  color: #f8fafc;
+}
+
+.lumen-clock-theme-light .lumen-clock-alarm-time {
+  color: #0f172a;
+}
+
+.lumen-clock-alarm-title {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lumen-clock-alarm-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.lumen-clock-alarm-toggle {
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: none;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lumen-clock-alarm-toggle-on {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.lumen-clock-alarm-toggle-off {
+  background: rgba(148, 163, 184, 0.25);
+  color: #94a3b8;
+}
+
+.lumen-clock-alarm-del-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.lumen-clock-alarm-del-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
